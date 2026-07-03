@@ -1,19 +1,20 @@
 <!DOCTYPE html> 
 <html lang="en"> 
-<head> 
+<head>
     <meta charset="UTF-8"> 
-    <title>Todo App</title> 
-    <link rel="stylesheet" type="text/css" href="../static/style.css"> 
+    <title>App</title> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
 
 </head> 
 
 <body>
+
     <div class="container">
 
         <nav class="nav-bar" id="nav-bar" aria-hidden="true">
-            <!-- <div class="nav-bar-header">
+            <div class="nav-bar-header">
 
-            </div> -->
+            </div>
             <ul class="nav-list">
                 <li class="nav-bar-item"><a href="#" class="nav-link">Сотрудники</a></li>
                 <li class="nav-bar-item"><a href="#" class="nav-link">Компании</a></li>
@@ -27,37 +28,31 @@
              <div class="info-block">
                 <h1>Main Page</h1>
                 <p>content</p>
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="excel_file" accept=".xlsx,.xls" required>
+                    <button type="submit">Excel</button>
+                </form>
             </div>           
 
 
+            {% for employee in employees %}
             <div class="data-row">
+
                 <div class="data-info">
-                    <span>ID</span>
-                    <span>ФИО</span>
-                    <span>Роль</span>
+                    {% for value in employee.values() %}
+                        <span>{{ value }}</span>
+                    {% endfor %}
                 </div>
 
                 <div class="data-actions">
                     <button class="info-btn">Инфо</button>
                     <button class="delete-btn">Удалить</button>
                 </div>
+
             </div>
+            {% endfor %}
 
-
-            <div class="data-row">
-                <div class="data-info">
-                    <span>ID</span>
-                    <span>ФИО</span>
-                    <span>Роль</span>
-                </div>
-
-                <div class="data-actions">
-                    <button class="info-btn">Инфо</button>
-                    <button class="delete-btn">Удалить</button>
-                </div>
-            </div>
-
-        </main>
+        </main> 
 
     </div>  
 </body>
