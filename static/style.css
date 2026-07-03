@@ -1,0 +1,124 @@
+/* Reset */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    border: 1px solid red !important;
+
+}
+
+/* Entire page */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: white;
+}
+
+/* Two-column layout */
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Left navigation */
+
+.nav-bar {
+    width: 240px;
+    height: 1440px;
+    background: #222;
+    color: white;
+    padding-top: 30px;
+}
+
+.nav-list {
+    list-style: none;
+}
+
+.nav-list a {
+    display: block;
+    padding: 14px 24px;
+    color: white;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.nav-list a:hover {
+    background: #444;
+}
+
+.nav-bar-item{
+    text-align: center;
+    height: 30%;
+}
+/* Right content */
+
+.content {
+    flex: 1;
+    padding: 40px;
+}
+
+.data-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 20px;
+
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+
+    margin-top: 20px;
+}
+
+.data-info {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.data-info span {
+    min-width: 120px;
+}
+
+.data-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.info-btn,
+.delete-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.info-btn {
+    background: #3498db;
+    color: white;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.info-btn:hover {
+    background: #2980b9;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
