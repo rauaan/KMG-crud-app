@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file
 import pandas as pd
+import io
 # from flask_sqlalchemy import sqlalchemy
 
 app = Flask(__name__)
@@ -75,6 +76,8 @@ def index():
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    global employees
+
     file = request.files["excel_file"]
 
     df = pd.read_excel(file)
@@ -83,6 +86,22 @@ def upload():
     return render_template(
         "main/index.html",
         employees=employees
+    )
+
+@app.route("/download", methods=["GET"])
+def download():
+    df = pd.DataFrame(employees)
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        
+    buffer.seek(0)
+    
+    return send_file(
+        buffer,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='file.xlsx'
     )
 
 
@@ -99,12 +118,16 @@ def create_employee():
             }
 
             employees.append(employee)
-
             return redirect(url_for("index"))
         except Exception as e:
             return f"ERROR{e}"
 
-    return render_template("main/create_employee.html")
+    return render_template(
+        "main/create_employee.html",
+        employee=None,
+        title="Добавить сотрудника",
+        button_text="Создать")
+    
 
 @app.route("/delete/<int:id>", methods=["GET", "POST"])
 def delete_employee(id:int):
@@ -118,7 +141,29 @@ def delete_employee(id:int):
             return redirect(url_for("index"))
         except Exception as e:
             return f"ERROR {e}"
-    
+
+
+@app.route("/edit/<int:id>", methods=["GET", "POST"])  
+def edit_employee(id):
+    employee = next((e for e in employees if e["id"] == id), None)
+
+    if employee is None:
+        return "Employee not found", 404
+
+    if request.method == "POST":
+        employee["name"] = request.form["name"]
+        employee["email"] = request.form["email"]
+        employee["position"] = request.form["position"]
+
+        return redirect(url_for("index"))
+
+    return render_template(
+        "main/create_employee.html",
+        employee=employee,
+        title="Редактировать сотрудника",
+        button_text="Сохранить"
+    )
+
 
 # class DataRow(db.Model):
 #     id = db.Column(db.Integer, primary_key = True)
