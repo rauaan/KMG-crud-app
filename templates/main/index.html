@@ -24,14 +24,15 @@
         <div class="data-row">
             <h1>Данные</h1>
             <form action="/upload" method="POST" enctype="multipart/form-data">
-                <input type="file" name="excel_file" accept=".xlsx,.xls" required>
-                <button type="submit">Excel</button>
+                <label for = "upload">Выберите файл</label>
+                <span id="file-name">нет документа</span>
+                <input type="file" name="excel_file" accept=".xlsx,.xls" id="upload" required>
+                <button type="submit">Загрузить</button>
             </form>
 
-            <!-- <form action="/download" method="GET" enctype="multipart/form-data">
-                <input type="file" name="excel_file" accept=".xlsx,.xls" required>
-                <button type="submit">T</button>
-            </form> -->
+            <form action="/download" method="GET" enctype="multipart/form-data">
+                <button type="submit">Скачать</button>
+            </form>
         </div>           
 
 
@@ -53,28 +54,17 @@
             </div>
 
             <div class="data-actions">
-                <button class="info-btn"> Инфо </button>
+                <a href="{{ url_for('edit_employee', id=employee['id']) }}" method="POST">
+                    <button class="info-btn"> Редактировать </button>
+                </a>
                 <form action="{{ url_for('delete_employee', id=employee['id']) }}" method="POST">
-                    <button class="delete-btn" type="submit">Delete</button>
+                    <button class="delete-btn" type="submit"> Удалить </button>
                 </form>
             </div>
 
         </div>
         {% endfor %}
 
-        
-
-
-
-        <!-- <div id="details-panel" class="details-panel">
-            <button class="close-btn" onclick="closePanel()">✕</button>
-
-            <h2 id="employee-name"></h2>
-
-            <p><strong>ID:</strong> <span id="employee-id"></span></p>
-            <p><strong>Role:</strong> <span id="employee-role"></span></p>
-            <p><strong>Email:</strong> <span id="employee-email"></span></p>
-        </div> -->
 
     </main> 
 

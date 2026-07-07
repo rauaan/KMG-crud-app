@@ -26,7 +26,7 @@ body {
 .nav-bar {
     width: 240px;
     height: 1440px;
-    background: #222;
+    background:black;
     color: white;
     padding-top: 30px;
 }
@@ -119,6 +119,10 @@ body {
 
 .delete-btn:hover {
     background: #c0392b;
+}
+
+#upload{
+    display: none;
 }
 /* /////// */
 /* .details-panel {
