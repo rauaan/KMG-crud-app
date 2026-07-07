@@ -1,58 +1,82 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head>
-    <meta charset="UTF-8"> 
+{% extends 'base.html' %}
+
+{% block head %}
     <title>App</title> 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+{% endblock %}
 
-</head> 
+{% block body %}
+<div class="container">
 
-<body>
+    <nav class="nav-bar" id="nav-bar" aria-hidden="true">
+        <div class="nav-bar-header">
 
-    <div class="container">
+        </div>
+        <ul class="nav-list">
+            <li class="nav-bar-item"><a href="#" class="nav-link">Сотрудники</a></li>
+            <li class="nav-bar-item"><a href="#" class="nav-link">Компании</a></li>
+                        <li class="nav-bar-item"><a href="#" class="nav-link">Скважины</a></li>
+            <li class="nav-bar-item"><a href="#" class="nav-link">Dashboard</a></li>
+        </ul>
+    </nav>
 
-        <nav class="nav-bar" id="nav-bar" aria-hidden="true">
-            <div class="nav-bar-header">
+    <main class="content">
 
+        <div class="data-row">
+            <h1>Данные</h1>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <input type="file" name="excel_file" accept=".xlsx,.xls" required>
+                <button type="submit">Excel</button>
+            </form>
+
+            <!-- <form action="/download" method="GET" enctype="multipart/form-data">
+                <input type="file" name="excel_file" accept=".xlsx,.xls" required>
+                <button type="submit">T</button>
+            </form> -->
+        </div>           
+
+
+        <div class="data-row">
+            <h1>Добавить</h1>
+
+            <a href="{{ url_for('create_employee') }}">
+                <button>Добавить сотрудника</button>
+            </a>
+        </div>
+
+        {% for employee in employees %}
+        <div class="data-row">
+
+            <div class="data-info">
+                {% for value in employee.values() %}
+                <span>{{ value }}</span>
+                {% endfor %}
             </div>
-            <ul class="nav-list">
-                <li class="nav-bar-item"><a href="#" class="nav-link">Сотрудники</a></li>
-                <li class="nav-bar-item"><a href="#" class="nav-link">Компании</a></li>
-                            <li class="nav-bar-item"><a href="#" class="nav-link">Скважины</a></li>
-                <li class="nav-bar-item"><a href="#" class="nav-link">Dashboard</a></li>
-            </ul>
-        </nav>
 
-        <main class="content">
-
-             <div class="info-block">
-                <h1>Main Page</h1>
-                <p>content</p>
-                <form action="/upload" method="POST" enctype="multipart/form-data">
-                    <input type="file" name="excel_file" accept=".xlsx,.xls" required>
-                    <button type="submit">Excel</button>
+            <div class="data-actions">
+                <button class="info-btn"> Инфо </button>
+                <form action="{{ url_for('delete_employee', id=employee['id']) }}" method="POST">
+                    <button class="delete-btn" type="submit">Delete</button>
                 </form>
-            </div>           
-
-
-            {% for employee in employees %}
-            <div class="data-row">
-
-                <div class="data-info">
-                    {% for value in employee.values() %}
-                        <span>{{ value }}</span>
-                    {% endfor %}
-                </div>
-
-                <div class="data-actions">
-                    <button class="info-btn">Инфо</button>
-                    <button class="delete-btn">Удалить</button>
-                </div>
-
             </div>
-            {% endfor %}
 
-        </main> 
+        </div>
+        {% endfor %}
 
-    </div>  
-</body>
+        
+
+
+
+        <!-- <div id="details-panel" class="details-panel">
+            <button class="close-btn" onclick="closePanel()">✕</button>
+
+            <h2 id="employee-name"></h2>
+
+            <p><strong>ID:</strong> <span id="employee-id"></span></p>
+            <p><strong>Role:</strong> <span id="employee-role"></span></p>
+            <p><strong>Email:</strong> <span id="employee-email"></span></p>
+        </div> -->
+
+    </main> 
+
+</div>  
+{% endblock %}

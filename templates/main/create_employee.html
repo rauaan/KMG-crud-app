@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Добавить сотрудника</h1>
+
+<form method="POST">
+
+    <label>Имя</label>
+    <input type="text" name="name" required>
+
+    <label>Email</label>
+    <input type="email" name="email" required>
+
+    <label>Должность</label>
+    <input type="text" name="position" required>
+
+    <button type="submit">Сохранить</button>
+
+</form>
+
+{% endblock %}
