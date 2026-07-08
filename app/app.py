@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
 import pandas as pd
-import io
+import io, os
 from extensions import db
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "postgresql+psycopg2://postgres:postgres@localhost:5432/KMG-T2"
-)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 
 db.init_app(app)
 from routes.users import users_bp
