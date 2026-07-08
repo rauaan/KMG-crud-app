@@ -5,27 +5,14 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
-
-    <nav class="nav-bar" id="nav-bar" aria-hidden="true">
-        <div class="nav-bar-header">
-
-        </div>
-        <ul class="nav-list">
-            <li class="nav-bar-item"><a href="#" class="nav-link">Сотрудники</a></li>
-            <li class="nav-bar-item"><a href="#" class="nav-link">Компании</a></li>
-                        <li class="nav-bar-item"><a href="#" class="nav-link">Скважины</a></li>
-            <li class="nav-bar-item"><a href="#" class="nav-link">Dashboard</a></li>
-        </ul>
-    </nav>
 
     <main class="content">
 
         <div class="data-row">
             <h1>Данные</h1>
             <form action="/upload" method="POST" enctype="multipart/form-data">
-                <label for = "upload">Выберите файл</label>
-                <span id="file-name">нет документа</span>
+                <label for = "upload" id="label-upload">Выберите файл</label>
+                <span id="file-name">-</span>
                 <input type="file" name="excel_file" accept=".xlsx,.xls" id="upload" required>
                 <button type="submit">Загрузить</button>
             </form>
@@ -39,34 +26,36 @@
         <div class="data-row">
             <h1>Добавить</h1>
 
-            <a href="{{ url_for('create_employee') }}">
+            <a href="{{ url_for('users.create_employee') }}">
                 <button>Добавить сотрудника</button>
             </a>
         </div>
 
+        {% if employees | length < 1 %}
+        <h1> Нет сотрудников </h1>
+        {% else %}
         {% for employee in employees %}
         <div class="data-row">
 
             <div class="data-info">
-                {% for value in employee.values() %}
-                <span>{{ value }}</span>
-                {% endfor %}
+                <span>{{ employee.id }}</span>
+                <span>{{ employee.lName }}</span>
+                <span>{{ employee.fName }}</span>
             </div>
 
             <div class="data-actions">
-                <a href="{{ url_for('edit_employee', id=employee['id']) }}" method="POST">
+                <a href="{{ url_for('users.edit_employee', id=employee['id']) }}" method="POST">
                     <button class="info-btn"> Редактировать </button>
                 </a>
-                <form action="{{ url_for('delete_employee', id=employee['id']) }}" method="POST">
-                    <button class="delete-btn" type="submit"> Удалить </button>
+                <form action="{{ url_for('users.delete_employee', id=employee['id']) }}" method="POST">
+                    <button class="delete-btn" type="submit" onclick="return confirm('Вы уверены что хотите удалить сотрудника?');"> Удалить </button>
                 </form>
             </div>
 
         </div>
         {% endfor %}
-
+        {% endif %}
 
     </main> 
 
-</div>  
 {% endblock %}

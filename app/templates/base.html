@@ -1,0 +1,24 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% block head %} {% endblock %}
+</head> 
+<body>
+    <div class="container">
+        <nav class="nav-bar" id="nav-bar" aria-hidden="true">
+            <div class="nav-bar-header">
+
+            </div>
+            <ul class="nav-list">
+                <li class="nav-bar-item"><a href="{{ url_for('users.users') }}" class="nav-link">Сотрудники</a></li>
+                <li class="nav-bar-item"><a href="{{ url_for('companies.companies') }}" class="nav-link">Компании</a></li>
+                            <li class="nav-bar-item"><a href="#" class="nav-link">Скважины</a></li>
+                <li class="nav-bar-item"><a href="#" class="nav-link">Dashboard</a></li>
+            </ul>
+        </nav>
+        {% block body %} {% endblock %}
+    </div>
+</body>

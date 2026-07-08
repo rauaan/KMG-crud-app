@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Добавить сотрудника</h1>
+
+<form method="POST">
+
+    <label>Фамилия</label>
+    <input type="text" name="lName" value="{{ employee.lName if employee else '' }}" required>
+
+    <label>Имя</label>
+    <input type="text" name="fName" value="{{ employee.fName if employee else '' }}"required>
+    <!-- " -->
+
+    <!-- <label>Компания</label>
+    <input type="text" name="company" required> -->
+
+    <button type="submit">Сохранить</button>
+
+</form>
+
+{% endblock %}
