@@ -26,29 +26,29 @@
         <div class="data-row">
             <h1>Добавить</h1>
 
-            <a href="{{ url_for('users.create_employee') }}">
-                <button>Добавить сотрудника</button>
+            <a href="{{ url_for('companies.create_company') }}">
+                <button>Добавить компанию</button>
             </a>
         </div>
 
-        {% if employees | length < 1 %}
+        {% if companies | length < 1 %}
         <h1> Нет Данных </h1>
         {% else %}
-        {% for employee in employees %}
+        {% for company in companies %}
         <div class="data-row">
 
             <div class="data-info">
-                <span>{{ employee.id }}</span>
-                <span>{{ employee.lName }}</span>
-                <span>{{ employee.fName }}</span>
+                <span>{{ company.id }}</span>
+                <span>{{ company.name }}</span>
+                <span>{{ company.region }}</span>
             </div>
 
             <div class="data-actions">
-                <a href="{{ url_for('users.edit_employee', id=employee['id']) }}" method="POST">
+                <a href="{{ url_for('companies.edit_company', id=company['id']) }}" method="POST">
                     <button class="info-btn"> Редактировать </button>
                 </a>
-                <form action="{{ url_for('users.delete_employee', id=employee['id']) }}" method="POST">
-                    <button class="delete-btn" type="submit" onclick="return confirm('Вы уверены что хотите удалить сотрудника?');"> Удалить </button>
+                <form action="{{ url_for('companies.delete_company', id=company['id']) }}" method="POST">
+                    <button class="deleste-btn" type="submit" onclick="return confirm('Вы уверены что хотите удалить сотрудника?');"> Удалить </button>
                 </form>
             </div>
 

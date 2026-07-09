@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from extensions import db
 from models import User
+from flask_login import login_required
 
 users_bp = Blueprint("users", __name__)
 
 
 @users_bp.route("/")
+@login_required
 def users():
     if request.method == "GET":
         employees = User.query.all()
@@ -13,6 +15,7 @@ def users():
 
 
 @users_bp.route("/create", methods=["GET", "POST"])
+@login_required
 def create_employee():
 
     if request.method == "POST":
@@ -36,6 +39,7 @@ def create_employee():
     
 
 @users_bp.route("/delete/<int:id>", methods=["POST"])
+@login_required
 def delete_employee(id:int):
     to_delete = User.query.get_or_404(id)
     
@@ -48,6 +52,7 @@ def delete_employee(id:int):
 
 
 @users_bp.route("/edit/<int:id>", methods=["GET", "POST"])  
+@login_required
 def edit_employee(id):
     to_edit = User.query.get_or_404(id)
     if request.method == "POST":
