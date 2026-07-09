@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request
+from flask import Blueprint, render_template, redirect, url_for, request, flash
 from forms import LoginForm, RegistrationForm
 from extensions import db, bcrypt, login_manager
 from models import Account
@@ -14,15 +14,17 @@ def load_user(user_id):
 def login():
     form = LoginForm()
 
-    if form.validate_on_submit:
+    if form.validate_on_submit():
         account = Account.query.filter_by(username = form.username.data).first()
-        if account:
-            if bcrypt.check_password_hash(account.password, form.password.data):
-                login_user(account)
+        if account and bcrypt.check_password_hash(account.password, form.password.data):
+            login_user(account)
 
-                next_page = request.args.get("next")
+            next_page = request.args.get("next")
 
-                return redirect(next_page or url_for("index"))
+            return redirect(next_page or url_for("index"))
+        
+        flash("Неверное имя пользователя или пароль.", "warning")
+
 
     return render_template("auth/login.html", form = form)
 
