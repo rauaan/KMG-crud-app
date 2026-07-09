@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="login-css.css">
 </head>
 <body>
-	<h1>Вход</h1>
+	<h1>Регистрация</h1>
 	<form method = "POST">
 		{{ form.hidden_tag() }}
 		{{ form.username }}
@@ -13,6 +13,6 @@
 		{{ form.submit }}
 	</form>
 
-	<a href = "{{ url_for('auth.register') }}">Нет аккаунта? Зарегистрироваться </a>
+	<a href = "{{ url_for('auth.login') }}">У вас уже есть аккаунт? Войти в систему </a>
 
 </body>
