@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Добавить  скважину</h1>
+
+<form method="POST">
+
+    <label>Название</label>
+    <input type="text" name="name" value="{{ well.name if well else '' }}" required>
+
+    <label>Тип</label>
+    <input type="text" name="type" value="{{ well.type if well else '' }}"required>
+
+
+    <label>Максимальная глубина бурения</label>
+    <input type="text" name="max_drilling_depth" value = "{{ well.max_drilling_depth if well else '' }}"required>
+
+    <label>Компания(id)</label>
+    <input type="text" name="company_id" value="{{ well.oil_company_id if well else '' }}" required>
+
+    <button type="submit">Сохранить</button>
+
+</form>
+
+{% endblock %}

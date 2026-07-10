@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from extensions import db
-from models import User
+from models import User, Company
 from flask_login import login_required
 
 users_bp = Blueprint("users", __name__)
@@ -11,7 +11,7 @@ users_bp = Blueprint("users", __name__)
 def users():
     if request.method == "GET":
         employees = User.query.all()
-    return render_template("main/index.html", employees=employees)  
+    return render_template("main/index.html", employees=employees, company = Company)  
 
 
 @users_bp.route("/create", methods=["GET", "POST"])
@@ -21,7 +21,8 @@ def create_employee():
     if request.method == "POST":
         new_user = User(
             lName = request.form['lName'],
-            fName = request.form['fName']
+            fName = request.form['fName'],
+            oil_company_id = request.form['company_id']
         )
         try:
             db.session.add(new_user)
@@ -29,7 +30,7 @@ def create_employee():
             return redirect(url_for("users.users"))
         except Exception as e:
             db.session.rollback()
-            return f"ERROR{e}"
+            return f"ERROR Нет компании с таким id"
 
     return render_template(
         "main/create_user.html",
@@ -57,7 +58,8 @@ def edit_employee(id):
     to_edit = User.query.get_or_404(id)
     if request.method == "POST":
         to_edit.lName = request.form['lName']
-        to_edit.fName = request.form['fName']
+        to_edit.fName = request.form['fName'],
+        to_edit.oil_company_id = request.form['company_id']
         
         try:
             db.session.commit()

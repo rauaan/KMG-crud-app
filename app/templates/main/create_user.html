@@ -13,8 +13,8 @@
     <input type="text" name="fName" value="{{ employee.fName if employee else '' }}"required>
     <!-- " -->
 
-    <!-- <label>Компания</label>
-    <input type="text" name="company" required> -->
+    <label>Компания(id)</label>
+    <input type="text" name="company_id" value="{{ employee.oil_company_id if employee else '' }}" required>
 
     <button type="submit">Сохранить</button>
 
