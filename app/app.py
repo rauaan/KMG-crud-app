@@ -18,10 +18,12 @@ login_manager.login_view = "auth.login"
 from routes.auth import auth_bp
 from routes.users import users_bp
 from routes.companies import companies_bp
+from routes.wells import wells_bp
 
 app.register_blueprint(users_bp, url_prefix="/users")
 app.register_blueprint(companies_bp, url_prefix="/companies")
 app.register_blueprint(auth_bp, url_prefix="/auth")
+app.register_blueprint(wells_bp, url_prefix="/wells")
 
 @app.route('/', methods=["GET"])
 @login_required

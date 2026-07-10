@@ -31,6 +31,17 @@
             </a>
         </div>
 
+
+        <div class="data-row">
+
+            <div class="data-info">
+                <span> <h2>ID</h2> </span>
+                <span> <h2>Фамилия</h2> </span>
+                <span> <h2>Имя</h2> </span>
+                <span> <h2>Компания</h2> </span>
+            </div>
+        </div>
+
         {% if employees | length < 1 %}
         <h1> Нет Данных </h1>
         {% else %}
@@ -41,6 +52,7 @@
                 <span>{{ employee.id }}</span>
                 <span>{{ employee.lName }}</span>
                 <span>{{ employee.fName }}</span>
+                <span>{{ company.query.get_or_404(employee.oil_company_id).name }}</span>
             </div>
 
             <div class="data-actions">
