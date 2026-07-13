@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from extensions import db
-from models import Well, Company
 from flask_login import login_required
+
+from app.extensions import db
+from app.models import Well, Company
 
 wells_bp = Blueprint("wells", __name__)
 

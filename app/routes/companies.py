@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from extensions import db
-from models import Company
 from flask_login import login_required
+from app.extensions import db
+from app.models import Company
 
 companies_bp = Blueprint("companies", __name__)
 
