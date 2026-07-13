@@ -1,9 +1,10 @@
 from flask import Flask, render_template
-import pandas as pd
-from extensions import db, bcrypt, login_manager
-from dotenv import load_dotenv
-from config import Config
 from flask_login import login_required
+from dotenv import load_dotenv
+
+from app.extensions import db, bcrypt, login_manager
+from app.config import Config
+from app.seed import make_data
 
 load_dotenv()
 
@@ -15,10 +16,7 @@ login_manager.init_app(app)
 
 login_manager.login_view = "auth.login"
 
-from routes.auth import auth_bp
-from routes.users import users_bp
-from routes.companies import companies_bp
-from routes.wells import wells_bp
+from app.routes import auth_bp, users_bp, companies_bp, wells_bp
 
 app.register_blueprint(users_bp, url_prefix="/users")
 app.register_blueprint(companies_bp, url_prefix="/companies")
@@ -63,7 +61,7 @@ def download():
     #     download_name='file.xlsx'
     # )
 
-
+app.cli.add_command(make_data)
 
 if __name__ == '__main__':
     with app.app_context():
