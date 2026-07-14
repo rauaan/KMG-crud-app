@@ -39,7 +39,26 @@ class Well(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(255), nullable = False)
     type = db.Column(db.String(255), nullable = False)
-    max_drilling_depth = db.Column(db.Integer, nullable = False)
+    max_drilling_depth = db.Column(db.Float, nullable = False)
     oil_company_id = db.Column(db.Integer, db.ForeignKey("oil_companies.id"), nullable = False)
 
     company = db.relationship("Company", back_populates = "wells")
+    daily_productions = db.relationship("DailyProduction", back_populates="well")
+
+
+class DailyProduction(db.Model):
+    __tablename__ = "daily_productions"
+
+    well_id = db.Column(db.Integer, db.ForeignKey("wells.id"), primary_key=True, nullable = False)
+    date = db.Column(db.Date, primary_key=True, nullable = False)
+
+    operating_hours = db.Column(db.Float, nullable=False) #время работы
+    liquid_produced = db.Column(db.Float, nullable=False) 
+    water_cut = db.Column(db.Float, nullable=False) #обводенность
+    density = db.Column(db.Float, nullable=False)   
+
+    well = db.relationship("Well", back_populates = "daily_productions")
+
+    @property
+    def net_oil(self):
+        return self.liquid_produced * (1 - self.water_cut / 100) * self.density

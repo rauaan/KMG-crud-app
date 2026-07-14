@@ -29,7 +29,7 @@ def create_company():
         except Exception as e:
             db.session.rollback()
             return f"ERROR{e}"
-
+    
     return render_template(
         "main/create_company.html",
         company=None,
