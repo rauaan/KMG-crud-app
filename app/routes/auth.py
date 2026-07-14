@@ -36,8 +36,13 @@ def register():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
         new_account = Account(username = form.username.data, password = hashed_password)
-        db.session.add(new_account)
-        db.session.commit()
+        try:
+            db.session.add(new_account)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return f"ERROR {e}"
+        
         return redirect(url_for('auth.login'))
 
     return render_template("auth/register.html", form = form)

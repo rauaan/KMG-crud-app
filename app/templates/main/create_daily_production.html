@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Создать</h1>
+
+<form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+    <label>Скважина (id)</label>
+    {{ form.well_id }}
+
+
+    <label>Дата</label>
+    {{ form.date }}
+
+
+    <label>Время работы</label>
+    {{ form.operating_hours }}
+
+    <label>Жидкость</label>
+    {{ form.liquid_produced }}
+
+    <label>Обводенность</label>
+    {{ form.water_cut }}
+
+    <label>Плотность</label>
+    {{ form.density }}
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+			{% for category, message in messages %}
+				<div class="{{ category }}">
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+
+    <button type="submit">Сохранить</button>
+
+</form>
+
+{% endblock %}
