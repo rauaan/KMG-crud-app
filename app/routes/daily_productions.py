@@ -59,10 +59,13 @@ def edit_daily_production(well_id, date):
         date=date
     ).first_or_404()
 
-    form = CreateDailyProduction(obj=report)
+    form = CreateDailyProduction(
+        obj=report, 
+        original_well_id=report.well_id, 
+        original_date=report.date
+    )
 
     if form.validate_on_submit():
-
         report.well_id = form.well_id.data
         report.date = form.date.data
         report.operating_hours = form.operating_hours.data
