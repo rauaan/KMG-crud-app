@@ -68,7 +68,7 @@
                 <a href="{{ url_for('daily_productions.edit_daily_production', well_id=report['well_id'], date=report['date']) }}" method="POST">
                     <button class="info-btn"> Редактировать </button>
                 </a>
-                <form action="{{ url_for('daily_productions.delete_daily_productionn', well_id=report['well_id'], date=report['date']) }}" method="POST">
+                <form action="{{ url_for('daily_productions.delete_daily_production', well_id=report['well_id'], date=report['date']) }}" method="POST">
                     <button class="delete-btn" type="submit" onclick="return confirm('Вы уверены что хотите удалить рапорт?');"> Удалить </button>
                 </form>
             </div>

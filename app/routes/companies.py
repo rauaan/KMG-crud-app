@@ -1,3 +1,9 @@
+"""Маршруты для управления нефтяными компаниями.
+
+Модуль содержит обработчики запросов для просмотра, создания,
+редактирования и удаления нефтяных компаний.
+"""
+
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required
 from app.extensions import db
@@ -9,6 +15,15 @@ companies_bp = Blueprint("companies", __name__)
 @companies_bp.route("/")
 @login_required
 def companies():
+    """Отображает список нефтяных компаний.
+
+    Получает все компании из базы данных и передает их
+    в HTML-шаблон для отображения.
+
+    Returns:
+        Response: Страница со списком компаний.
+    """
+
     if request.method == "GET":
         companies = Company.query.all()
     return render_template("main/list_companies.html", companies=companies)  
@@ -16,6 +31,15 @@ def companies():
 @companies_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create_company():
+    """Создает новую нефтяную компанию.
+
+    При GET-запросе отображает форму создания компании.
+    При POST-запросе сохраняет новую компанию в базе данных.
+
+    Returns:
+        Response: Форма создания или перенаправление
+        к списку компаний.
+    """
 
     if request.method == "POST":
         new_company = Company(
@@ -39,6 +63,16 @@ def create_company():
 @companies_bp.route("/edit/<int:id>", methods = ["GET", "POST"])
 @login_required
 def edit_company(id:int):
+    """Редактирует существующую нефтяную компанию.
+
+    Args:
+        id: Идентификатор редактируемой компании.
+
+    Returns:
+        Response: Форма редактирования или перенаправление
+        к списку компаний после успешного сохранения.
+    """
+
     to_edit = Company.query.get_or_404(id)
     if request.method == "POST":
         to_edit.name = request.form['name']
@@ -61,6 +95,15 @@ def edit_company(id:int):
 @companies_bp.route("/delete/<int:id>", methods = ["POST"])
 @login_required
 def delete_company(id:int):
+    """Удаляет нефтяную компанию.
+
+    Args:
+        id: Идентификатор удаляемой компании.
+
+    Returns:
+        Response: Перенаправление к списку компаний.
+    """
+    
     to_delete = Company.query.get_or_404(id)
     
     try: 

@@ -1,3 +1,9 @@
+"""Маршруты для управления суточными производственными рапортами.
+
+Модуль содержит обработчики запросов для просмотра, создания,
+редактирования и удаления производственных рапортов скважин.
+"""
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.extensions import db
@@ -10,6 +16,15 @@ daily_productions_bp = Blueprint("daily_productions", __name__)
 @daily_productions_bp.route("/")
 @login_required
 def daily_productions():
+    """Отображает список производственных рапортов.
+
+    Получает все рапорты из базы данных и передает их
+    в HTML-шаблон для отображения.
+
+    Returns:
+        Response: Страница со списком рапортов.
+    """
+
     if request.method == "GET":
         reports = DailyProduction.query.all()
     return render_template("main/list_daily_productions.html", reports=reports)  
@@ -18,31 +33,40 @@ def daily_productions():
 @daily_productions_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create_daily_production():
+    """Создает новый производственный рапорт.
+
+    При GET-запросе отображает форму создания рапорта.
+    При POST-запросе выполняет валидацию данных и сохраняет
+    новый рапорт в базе данных.
+
+    Returns:
+        Response: Форма создания или перенаправление
+        к списку рапортов.
+    """
 
     form = CreateDailyProduction()
-    if request.method == "POST":
-        if form.validate_on_submit():
+    if form.validate_on_submit():
 
-            new_daily_production = DailyProduction(
-                well_id = form.well_id.data,
-                date = form.date.data,
-                operating_hours = form.operating_hours.data,
-                liquid_produced = form.liquid_produced.data,
-                water_cut = form.water_cut.data,
-                density = form.density.data
-            )
-            try:
-                db.session.add(new_daily_production)
-                db.session.commit()
-            except Exception as e:
-                db.session.rollback()
-                return f"ERROR{e}"
+        new_daily_production = DailyProduction(
+            well_id = form.well_id.data,
+            date = form.date.data,
+            operating_hours = form.operating_hours.data,
+            liquid_produced = form.liquid_produced.data,
+            water_cut = form.water_cut.data,
+            density = form.density.data
+        )
+        try:
+            db.session.add(new_daily_production)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return f"ERROR{e}"
 
-            return redirect(url_for("daily_productions.daily_productions"))
+        return redirect(url_for("daily_productions.daily_productions"))
 
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(error, "warning")
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(error, "warning")
 
     return render_template(
         "main/create_daily_production.html",
@@ -54,6 +78,20 @@ def create_daily_production():
 @daily_productions_bp.route("/edit/<int:well_id>/<date>", methods=["GET", "POST"])
 @login_required
 def edit_daily_production(well_id, date):
+    """Редактирует существующий производственный рапорт.
+
+    Рапорт идентифицируется составным первичным ключом,
+    состоящим из идентификатора скважины и даты.
+
+    Args:
+        well_id: Идентификатор скважины.
+        date: Дата производственного рапорта.
+
+    Returns:
+        Response: Форма редактирования или перенаправление
+        к списку рапортов после успешного сохранения.
+    """
+
     report = DailyProduction.query.filter_by(
         well_id=well_id,
         date=date
@@ -95,7 +133,17 @@ def edit_daily_production(well_id, date):
     
 @daily_productions_bp.route("/delete/<int:well_id>/<date>", methods = ["POST"])
 @login_required
-def delete_daily_productionn(well_id, date):
+def delete_daily_production(well_id, date):
+    """Удаляет производственный рапорт.
+
+    Args:
+        well_id: Идентификатор скважины.
+        date: Дата производственного рапорта.
+
+    Returns:
+        Response: Перенаправление к списку рапортов.
+    """
+
     to_delete = DailyProduction.query.filter_by(
             well_id=well_id,
             date=date
