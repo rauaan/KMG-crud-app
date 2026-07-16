@@ -27,7 +27,7 @@ def daily_productions():
 
     if request.method == "GET":
         reports = DailyProduction.query.all()
-    return render_template("main/list_daily_productions.html", reports=reports)  
+    return render_template("main/list_daily_productions.html", reports=reports)
 
 
 @daily_productions_bp.route("/create", methods=["GET", "POST"])
@@ -46,14 +46,13 @@ def create_daily_production():
 
     form = CreateDailyProduction()
     if form.validate_on_submit():
-
         new_daily_production = DailyProduction(
-            well_id = form.well_id.data,
-            date = form.date.data,
-            operating_hours = form.operating_hours.data,
-            liquid_produced = form.liquid_produced.data,
-            water_cut = form.water_cut.data,
-            density = form.density.data
+            well_id=form.well_id.data,
+            date=form.date.data,
+            operating_hours=form.operating_hours.data,
+            liquid_produced=form.liquid_produced.data,
+            water_cut=form.water_cut.data,
+            density=form.density.data,
         )
         try:
             db.session.add(new_daily_production)
@@ -70,9 +69,10 @@ def create_daily_production():
 
     return render_template(
         "main/create_daily_production.html",
-        form = form,
+        form=form,
         title="Создать рапорт",
-        button_text="Создать")
+        button_text="Создать",
+    )
 
 
 @daily_productions_bp.route("/edit/<int:well_id>/<date>", methods=["GET", "POST"])
@@ -92,15 +92,10 @@ def edit_daily_production(well_id, date):
         к списку рапортов после успешного сохранения.
     """
 
-    report = DailyProduction.query.filter_by(
-        well_id=well_id,
-        date=date
-    ).first_or_404()
+    report = DailyProduction.query.filter_by(well_id=well_id, date=date).first_or_404()
 
     form = CreateDailyProduction(
-        obj=report, 
-        original_well_id=report.well_id, 
-        original_date=report.date
+        obj=report, original_well_id=report.well_id, original_date=report.date
     )
 
     if form.validate_on_submit():
@@ -128,10 +123,11 @@ def edit_daily_production(well_id, date):
         "main/create_daily_production.html",
         form=form,
         title="Редактировать рапорт",
-        button_text="Сохранить"
+        button_text="Сохранить",
     )
-    
-@daily_productions_bp.route("/delete/<int:well_id>/<date>", methods = ["POST"])
+
+
+@daily_productions_bp.route("/delete/<int:well_id>/<date>", methods=["POST"])
 @login_required
 def delete_daily_production(well_id, date):
     """Удаляет производственный рапорт.
@@ -145,14 +141,13 @@ def delete_daily_production(well_id, date):
     """
 
     to_delete = DailyProduction.query.filter_by(
-            well_id=well_id,
-            date=date
-        ).first_or_404()
-    
-    try: 
+        well_id=well_id, date=date
+    ).first_or_404()
+
+    try:
         db.session.delete(to_delete)
         db.session.commit()
         return redirect(url_for("daily_productions.daily_productions"))
-    
+
     except Exception as e:
         return f"ERROR {e}"

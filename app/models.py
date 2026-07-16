@@ -122,8 +122,4 @@ class DailyProduction(db.Model):
         Returns:
             float: Объем чистой нефти в тоннах.
         """
-        return (
-            self.liquid_produced
-            * (1 - self.water_cut / 100)
-            * self.density
-        )
+        return self.liquid_produced * (1 - self.water_cut / 100) * self.density
