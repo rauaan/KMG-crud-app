@@ -1,14 +1,34 @@
+"""Инициализация Flask-приложения.
+
+Модуль содержит фабрику приложения, регистрацию расширений,
+Blueprint-маршрутов, CLI-команд и создание структуры базы данных.
+"""
+
 from flask import Flask, render_template
 from flask_login import login_required
 
-from app.extensions import db, bcrypt, login_manager
+from app.extensions import db, bcrypt, login_manager, migrate
 from app.config import Config
 from app.seed import make_data
 
 def create_app():
+    """Создает и настраивает экземпляр Flask-приложения.
+
+    Выполняет следующие действия:
+        - загружает конфигурацию приложения;
+        - инициализирует используемые расширения Flask;
+        - регистрирует Blueprint-маршруты;
+        - подключает пользовательские CLI-команды;
+        - создает таблицы базы данных при первом запуске.
+
+    Returns:
+        Flask: Настроенный экземпляр приложения.
+    """
+
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
+    migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
 
@@ -25,6 +45,13 @@ def create_app():
     @app.route('/', methods=["GET"])
     @login_required
     def index():
+        """Отображает главную страницу приложения.
+
+        Доступна только авторизованным пользователям.
+
+        Returns:
+            Response: HTML-страница главного меню.
+        """
 
         return render_template("base.html")
 
@@ -62,7 +89,5 @@ def create_app():
 
     app.cli.add_command(make_data)
 
-    with app.app_context():
-        db.create_all()
 
     return app

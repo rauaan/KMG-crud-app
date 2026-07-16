@@ -1,3 +1,9 @@
+"""Маршруты аутентификации пользователей.
+
+Модуль содержит обработчики запросов для регистрации,
+авторизации и выхода пользователей из системы.
+"""
+
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, login_required, logout_user
 
@@ -9,10 +15,32 @@ auth_bp = Blueprint("auth", __name__)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Account.query.get(int(user_id))
+    """Загружает пользователя по его идентификатору.
+
+    Используется Flask-Login для восстановления информации
+    об авторизованном пользователе из сессии.
+
+    Args:
+        user_id: Идентификатор пользователя.
+
+    Returns:
+        Account | None: Найденный пользователь или None.
+    """
+    return db.session.get(Account, int(user_id))
 
 @auth_bp.route("/login", methods = ["GET", "POST"])
 def login():
+    """Выполняет авторизацию пользователя.
+
+    При GET-запросе отображает форму входа.
+    При POST-запросе проверяет введенные учетные данные
+    и выполняет вход в систему.
+
+    Returns:
+        Response: Форма входа или перенаправление
+        на главную страницу после успешной авторизации.
+    """
+
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -31,6 +59,17 @@ def login():
 
 @auth_bp.route("/register", methods = ["GET", "POST"])
 def register():
+    """Регистрирует нового пользователя.
+
+    При GET-запросе отображает форму регистрации.
+    При POST-запросе создает новую учетную запись,
+    предварительно хешируя пароль.
+
+    Returns:
+        Response: Форма регистрации или перенаправление
+        на страницу входа после успешной регистрации.
+    """
+
     form = RegistrationForm()
 
     if form.validate_on_submit():
@@ -48,8 +87,17 @@ def register():
     return render_template("auth/register.html", form = form)
 
 
-@auth_bp.route("/logout", methods =  ["GET", "POST"])
+@auth_bp.route("/logout", methods =  ["GET"])
 @login_required
 def logout():
+    """Завершает пользовательскую сессию.
+
+    Выполняет выход пользователя из системы и
+    перенаправляет его на страницу авторизации.
+
+    Returns:
+        Response: Перенаправление на страницу входа.
+    """
+
     logout_user()
     return redirect(url_for("auth.login"))
