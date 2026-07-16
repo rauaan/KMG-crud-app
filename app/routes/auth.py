@@ -13,6 +13,7 @@ from app.forms import LoginForm, RegistrationForm
 
 auth_bp = Blueprint("auth", __name__)
 
+
 @login_manager.user_loader
 def load_user(user_id):
     """Загружает пользователя по его идентификатору.
@@ -28,7 +29,8 @@ def load_user(user_id):
     """
     return db.session.get(Account, int(user_id))
 
-@auth_bp.route("/login", methods = ["GET", "POST"])
+
+@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     """Выполняет авторизацию пользователя.
 
@@ -44,20 +46,20 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        account = Account.query.filter_by(username = form.username.data).first()
+        account = Account.query.filter_by(username=form.username.data).first()
         if account and bcrypt.check_password_hash(account.password, form.password.data):
             login_user(account)
 
             next_page = request.args.get("next")
 
             return redirect(next_page or url_for("index"))
-        
+
         flash("Неверное имя пользователя или пароль.", "warning")
 
+    return render_template("auth/login.html", form=form)
 
-    return render_template("auth/login.html", form = form)
 
-@auth_bp.route("/register", methods = ["GET", "POST"])
+@auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     """Регистрирует нового пользователя.
 
@@ -73,21 +75,23 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
-        new_account = Account(username = form.username.data, password = hashed_password)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode(
+            "utf-8"
+        )
+        new_account = Account(username=form.username.data, password=hashed_password)
         try:
             db.session.add(new_account)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
             return f"ERROR {e}"
-        
-        return redirect(url_for('auth.login'))
 
-    return render_template("auth/register.html", form = form)
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/register.html", form=form)
 
 
-@auth_bp.route("/logout", methods =  ["GET"])
+@auth_bp.route("/logout", methods=["GET"])
 @login_required
 def logout():
     """Завершает пользовательскую сессию.

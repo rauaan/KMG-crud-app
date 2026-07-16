@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Config:
     """Базовая конфигурация Flask-приложения.
 

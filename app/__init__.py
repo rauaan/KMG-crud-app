@@ -11,6 +11,7 @@ from app.extensions import db, bcrypt, login_manager, migrate
 from app.config import Config
 from app.seed import make_data
 
+
 def create_app():
     """Создает и настраивает экземпляр Flask-приложения.
 
@@ -34,7 +35,13 @@ def create_app():
 
     login_manager.login_view = "auth.login"
 
-    from app.routes import auth_bp, users_bp, companies_bp, wells_bp, daily_productions_bp
+    from app.routes import (
+        auth_bp,
+        users_bp,
+        companies_bp,
+        wells_bp,
+        daily_productions_bp,
+    )
 
     app.register_blueprint(users_bp, url_prefix="/users")
     app.register_blueprint(companies_bp, url_prefix="/companies")
@@ -42,7 +49,7 @@ def create_app():
     app.register_blueprint(wells_bp, url_prefix="/wells")
     app.register_blueprint(daily_productions_bp, url_prefix="/daily_productions")
 
-    @app.route('/', methods=["GET"])
+    @app.route("/", methods=["GET"])
     @login_required
     def index():
         """Отображает главную страницу приложения.
@@ -55,7 +62,6 @@ def create_app():
 
         return render_template("base.html")
 
-
     @app.route("/upload", methods=["POST"])
     def upload():
         global employees
@@ -65,10 +71,7 @@ def create_app():
         # df = pd.read_excel(file)
         # employees = df.to_dict(orient="records")
 
-        return render_template(
-            "main/index.html",
-            employees=employees
-        )
+        return render_template("main/index.html", employees=employees)
 
     @app.route("/download", methods=["GET"])
     def download():
@@ -77,9 +80,9 @@ def create_app():
         # buffer = io.BytesIO()
         # with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
         #     df.to_excel(writer, sheet_name='Sheet1', index=False)
-            
+
         # buffer.seek(0)
-        
+
         # return send_file(
         #     buffer,
         #     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -88,6 +91,5 @@ def create_app():
         # )
 
     app.cli.add_command(make_data)
-
 
     return app

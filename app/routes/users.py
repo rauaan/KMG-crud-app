@@ -26,7 +26,7 @@ def users():
     """
     if request.method == "GET":
         employees = User.query.all()
-    return render_template("main/index.html", employees=employees, company = Company)  
+    return render_template("main/index.html", employees=employees, company=Company)
 
 
 @users_bp.route("/create", methods=["GET", "POST"])
@@ -44,9 +44,9 @@ def create_employee():
 
     if request.method == "POST":
         new_user = User(
-            lName = request.form['lName'],
-            fName = request.form['fName'],
-            oil_company_id = request.form['company_id']
+            lName=request.form["lName"],
+            fName=request.form["fName"],
+            oil_company_id=request.form["company_id"],
         )
         try:
             db.session.add(new_user)
@@ -60,10 +60,11 @@ def create_employee():
         "main/create_user.html",
         employee=None,
         title="Добавить сотрудника",
-        button_text="Создать")
-    
+        button_text="Создать",
+    )
 
-@users_bp.route("/edit/<int:id>", methods=["GET", "POST"])  
+
+@users_bp.route("/edit/<int:id>", methods=["GET", "POST"])
 @login_required
 def edit_employee(id):
     """Редактирует информацию о сотруднике.
@@ -78,31 +79,31 @@ def edit_employee(id):
         Response: Форма редактирования или перенаправление
         к списку сотрудников после успешного сохранения.
     """
-    
+
     to_edit = User.query.get_or_404(id)
     if request.method == "POST":
-        to_edit.lName = request.form['lName']
-        to_edit.fName = request.form['fName']
-        to_edit.oil_company_id = request.form['company_id']
-        
+        to_edit.lName = request.form["lName"]
+        to_edit.fName = request.form["fName"]
+        to_edit.oil_company_id = request.form["company_id"]
+
         try:
             db.session.commit()
             return redirect(url_for("users.users"))
 
         except Exception as e:
             return f"ERROR {e}"
-    else:     
+    else:
         return render_template(
             "main/create_user.html",
             employee=to_edit,
             title="Редактировать сотрудника",
-            button_text="Сохранить"
+            button_text="Сохранить",
         )
 
 
 @users_bp.route("/delete/<int:id>", methods=["POST"])
 @login_required
-def delete_employee(id:int):
+def delete_employee(id: int):
     """Удаляет сотрудника из базы данных.
 
     Args:
@@ -112,8 +113,8 @@ def delete_employee(id:int):
         Response: Перенаправление к списку сотрудников.
     """
     to_delete = User.query.get_or_404(id)
-    
-    try: 
+
+    try:
         db.session.delete(to_delete)
         db.session.commit()
         return redirect(url_for("users.users"))
