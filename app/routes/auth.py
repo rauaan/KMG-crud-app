@@ -54,7 +54,7 @@ def login():
 
             return redirect(next_page or url_for("index"))
 
-        flash("Неверное имя пользователя или пароль.", "warning")
+        form.username.errors.append("Неверное имя пользователя или пароль.")
 
     return render_template("auth/login.html", form=form)
 
