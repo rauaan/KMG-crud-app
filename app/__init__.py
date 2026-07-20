@@ -60,7 +60,7 @@ def create_app():
             Response: HTML-страница главного меню.
         """
 
-        return render_template("base.html")
+        return render_template("main/index.html")
 
     @app.route("/upload", methods=["POST"])
     def upload():

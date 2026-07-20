@@ -1,82 +1,73 @@
 {% extends 'base.html' %}
 
-{% block head %}
-    <title>App</title> 
+{% block title %}
+    Рапорты
 {% endblock %}
 
-{% block body %}
-
-    <main class="content">
-
-        <div class="data-row">
-            <h1>Данные</h1>
-            <form action="/upload" method="POST" enctype="multipart/form-data">
-                <label for = "upload" id="label-upload">Выберите файл</label>
-                <span id="file-name">-</span>
-                <input type="file" name="excel_file" accept=".xlsx,.xls" id="upload" required>
-                <button type="submit">Загрузить</button>
-            </form>
-
-            <form action="/download" method="GET" enctype="multipart/form-data">
-                <button type="submit">Скачать</button>
-            </form>
-        </div>           
+{% block content %}           
 
 
-        <div class="data-row">
-            <h1>Создать рапорт</h1>
+    <div class="data-row">
+        <h1 class="font-semibold ">Рапорты</h1>
 
-            <a href="{{ url_for('daily_productions.create_daily_production') }}">
-                <button>Создать рапорт</button>
+        <a href="{{ url_for('daily_productions.create_daily_production') }}">
+            <button class="button button-primary">Создать рапорт</button>
+        </a>
+    </div>
+
+
+    <div class="data-row data-grid-report">
+        <div class="font-semibold">Скважина (ID)</div>
+        <div class="font-semibold">Дата</div>
+        <div class="font-semibold">Время работы</div>
+        <div class="font-semibold">Жидкость</div>
+        <div class="font-semibold">Обводенность</div>
+        <div class="font-semibold">Плотность</div>
+        <div class="font-semibold">Чистая нефть</div>
+        <div class="font-semibold text-center">Действия</div>
+    </div>
+
+
+    {% if reports | length < 1 %}
+    <h1> Нет Данных </h1>
+    {% else %}
+    {% for report in reports %}
+    <div class="data-row data-grid-report">
+
+        <div>{{ report.well_id }}</div>
+        <div>{{ report.date }}</div>
+        <div>{{ report.operating_hours }}</div>
+        <div>{{ report.liquid_produced }}</div>
+        <div>{{ report.water_cut }}</div>
+        <div>{{ report.density }}</div>
+        <div>{{ "%.2f"|format(report.net_oil) }}</div>
+    
+
+        <div class="flex justify-end gap-2">
+            <a href="{{ url_for('daily_productions.edit_daily_production',
+                well_id=report.well_id,
+                date=report.date) }}">
+                <button class="button button-primary">
+                    Редактировать
+                </button>
             </a>
+
+            <form action="{{ url_for('daily_productions.delete_daily_production',
+                well_id=report.well_id,
+                date=report.date) }}"
+                method="POST">
+
+                <button
+                    class="button button-delete"
+                    onclick="return confirm('Вы уверены что хотите удалить рапорт?')">
+                    Удалить
+                </button>
+            </form>
         </div>
 
+    </div>
+    {% endfor %}
+    {% endif %}
 
-        <div class="data-row">
-
-            <div class="data-info">
-                <span> <h2>Скважина (ID)</h2> </span>
-                <span> <h2>Дата</h2> </span>
-                <span> <h2>Время работы</h2> </span>
-                <span> <h2>Жидкость</h2> </span>
-                <span> <h2>Обводенность</h2> </span>
-                <span> <h2>Плотность</h2> </span>
-                <span> <h2>Чистая нефть</h2> </span>
-            </div>
-        </div>
-
-
-        {% if reports | length < 1 %}
-        <h1> Нет Данных </h1>
-        {% else %}
-        {% for report in reports %}
-        <div class="data-row">
-
-            <div class="data-info">
-                <span>{{ report.well_id }}</span>
-                <span>{{ report.date }}</span>
-                <span>{{ report.operating_hours }}</span>
-                <span>{{ report.liquid_produced }}</span>
-                <span>{{ report.water_cut }}</span>
-                <span>{{ report.density }}</span>
-                <span>{{ "%.2f"|format(report.net_oil) }}</span>
-                
-            </div>
-
-
-            <div class="data-actions">
-                <a href="{{ url_for('daily_productions.edit_daily_production', well_id=report['well_id'], date=report['date']) }}" method="POST">
-                    <button class="info-btn"> Редактировать </button>
-                </a>
-                <form action="{{ url_for('daily_productions.delete_daily_production', well_id=report['well_id'], date=report['date']) }}" method="POST">
-                    <button class="delete-btn" type="submit" onclick="return confirm('Вы уверены что хотите удалить рапорт?');"> Удалить </button>
-                </form>
-            </div>
-
-        </div>
-        {% endfor %}
-        {% endif %}
-
-    </main> 
 
 {% endblock %}   

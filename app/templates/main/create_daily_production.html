@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
 
-{% block body %}
+{% block content %}
 
-<h1>Создать</h1>
+<h1 class="mb-6 text-center text-2xl font-bold">Создать Рапорт</h1>
 
-<form method="POST" novalidate>
+<form method="POST" novalidate class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4 justify-center">
     {{ form.hidden_tag() }}
-    <label>Скважина (id)</label>
-    {{ form.well_id }}
+    <label>Скважина(id)</label>
+    {{ form.well_id(class="input") }}
 
 
     <label>Дата</label>
-    {{ form.date }}
+    {{ form.date(class="input") }}
 
 
     <label>Время работы</label>
-    {{ form.operating_hours }}
+    {{ form.operating_hours(class="input") }}
 
     <label>Жидкость</label>
-    {{ form.liquid_produced }}
+    {{ form.liquid_produced(class="input") }}
 
     <label>Обводенность</label>
-    {{ form.water_cut }}
+    {{ form.water_cut(class="input") }}
 
     <label>Плотность</label>
-    {{ form.density }}
+    {{ form.density(class="input") }}
     
     {% with messages = get_flashed_messages(with_categories=true) %}
 		{% if messages %}
@@ -36,7 +36,8 @@
 		{% endif %}
 	{% endwith %}
 
-    <button type="submit">Сохранить</button>
+    <div></div>
+    <button type="submit" class="button button-primary">Сохранить</button>
 
 </form>
 

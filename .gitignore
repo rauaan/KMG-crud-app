@@ -1,5 +1,11 @@
-#MacOS
+# MacOS
 .DS_Store
+
+# Dependencies
+node_modules/
+
+# Generated CSS
+output.css
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

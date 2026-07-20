@@ -1,26 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Log in</title>
-<link rel="stylesheet" href="login-css.css">
-</head>
-<body>
-	<h1>Вход</h1>
-	<form method = "POST">
-		{{ form.hidden_tag() }}
-		{{ form.username }}
-		{{ form.password }}
-		{{ form.submit }}
-	</form>
+{% extends 'base.html' %}
 
-	<a href = "{{ url_for('auth.register') }}">Нет аккаунта? Зарегистрироваться </a>
-	{% with messages = get_flashed_messages(with_categories=true) %}
-		{% if messages %}
-			{% for category, message in messages %}
-				<div class="{{ category }}">
-					{{ message }}
-				</div>
-			{% endfor %}
-		{% endif %}
-	{% endwith %}
-</body>
+{% block title %}
+Вход
+{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content %}
+
+<h1 class="mb-6 text-center text-2xl font-bold">Вход</h1>
+
+<form method="POST" class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4">
+
+    {{ form.hidden_tag() }}
+
+    <label>Имя пользователя</label>
+    {{ form.username(class="input") }}
+
+    <label>Пароль</label>
+    {{ form.password(class="input") }}
+
+    <div></div>
+    {{ form.submit(class="button button-primary") }}
+
+</form>
+
+<div class="mt-6 text-center">
+    <a
+        href="{{ url_for('auth.register') }}"
+        class="text-blue-600 hover:underline"
+    >
+        Нет аккаунта? Зарегистрироваться
+    </a>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="mx-auto mt-4 max-w-lg">
+            {% for category, message in messages %}
+                <div class="{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

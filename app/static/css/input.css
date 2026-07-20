@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@source "../templates";
+
+@layer components {
+    .data-row {
+        @apply flex items-center justify-between
+               mt-5 rounded-lg border border-gray-300
+               bg-white px-5 py-4 shadow;
+    }
+
+    .input {
+        @apply rounded-lg border border-gray-300 px-3 py-2 focus:border-[#3498db] focus:outline-none;
+    }
+
+    .button {
+        @apply px-4 py-2 rounded-md cursor-pointer border-none text-white text-center
+    }
+
+    .button-primary {
+        @apply bg-[#3498db] hover:bg-[#2980b9]
+    }
+
+    .button-delete {
+        @apply bg-[#e74c3c] hover:bg-[#c0392b]
+    }
+
+    .nav-link {
+        @apply block px-6 py-4 text-center transition-colors hover:bg-neutral-700;
+    }
+
+    .data-grid-wells {
+    @apply grid items-center gap-4;
+    grid-template-columns: 80px 2fr 1fr 1.5fr 2fr 220px;
+}
+
+.data-grid-report {
+    @apply grid items-center gap-4;
+    grid-template-columns:
+        80px
+        140px
+        120px
+        120px
+        120px
+        120px
+        140px
+        220px;
+}
+
+.data-grid-companies {
+    @apply grid items-center gap-4;
+    grid-template-columns:
+        80px
+        2fr 
+        1fr
+        220px;
+        
+}
+
+.data-grid-users {
+    @apply grid items-center gap-4;
+    grid-template-columns:
+        80px
+        2fr 
+        1fr
+        1.5fr 
+        220px;
+        
+}
+
+}

@@ -1,26 +1,42 @@
-<!DOCTYPE html> 
-<html lang="en"> 
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8"> 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    {% block head %} {% endblock %}
-</head> 
-<body>
-    <div class="container">
-        <nav class="nav-bar" id="nav-bar" aria-hidden="true">
+
+    <title>{% block title %}KMG{% endblock %}</title>
+
+    {% block head %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex">
+
+    {% block sidebar %}
+    <aside class="w-64 bg-gray-900 text-white p-0 m">
+        <nav class="bg-gray-900 text-white p-0" aria-hidden="true">
             <div class="nav-bar-header">
 
             </div>
             <ul class="nav-list">
-                <li class="nav-bar-item"><a href="{{ url_for('users.users') }}" class="nav-link">Сотрудники</a></li>
-                <li class="nav-bar-item"><a href="{{ url_for('companies.companies') }}" class="nav-link">Компании</a></li>
-                <li class="nav-bar-item"><a href="{{ url_for('wells.wells') }}" class="nav-link">Скважины</a></li>
-                <li class="nav-bar-item"><a href="{{ url_for('daily_productions.daily_productions') }}" class="nav-link">Рапорты</a></li>
+                <li ><a href="{{ url_for('users.users') }}" class="nav-link">Сотрудники</a></li>
+                <li ><a href="{{ url_for('companies.companies') }}" class="nav-link">Компании</a></li>
+                <li ><a href="{{ url_for('wells.wells') }}" class="nav-link">Скважины</a></li>
+                <li ><a href="{{ url_for('daily_productions.daily_productions') }}" class="nav-link">Рапорты</a></li>
             </ul>
         </nav>
+        <a 
+        href="{{ url_for('auth.logout') }}" 
+        class="inline-block rounded-md px-3 py-2 transition-colors hover:bg-gray-700"
+            >Выйти
+        </a>
+    </aside>
+    {% endblock %}
+    
+    <main class="flex-1 p-6">
+        {% block content %}{% endblock %}
+    </main>
 
-        <a href="{{ url_for('auth.logout') }}">Выйти</a>
-        {% block body %} {% endblock %}
-    </div>
 </body>
+</html>

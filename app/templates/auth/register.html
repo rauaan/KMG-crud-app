@@ -1,18 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Log in</title>
-<link rel="stylesheet" href="login-css.css">
-</head>
-<body>
-	<h1>Регистрация</h1>
-	<form method = "POST">
-		{{ form.hidden_tag() }}
-		{{ form.username }}
-		{{ form.password }}
-		{{ form.submit }}
-	</form>
+{% extends 'base.html' %}
 
-	<a href = "{{ url_for('auth.login') }}">У вас уже есть аккаунт? Войти в систему </a>
+{% block title %}
+Вход
+{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content %}
 
-</body>
+<h1 class="mb-6 text-center text-2xl font-bold">Регистрация</h1>
+
+<form method = "POST" class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4">
+	{{ form.hidden_tag() }}
+
+	 <label>Имя пользователя</label>
+	{{ form.username(class="input") }}
+
+	<label>Пароль</label>
+	{{ form.password(class="input") }}
+
+	<div></div>
+	{{ form.submit(class="button button-primary") }}
+</form>
+
+<div class="mt-6 text-center">
+	<a 
+	href = "{{ url_for('auth.login') }}" 
+	class="text-blue-600 hover:underline"
+	>
+		У вас уже есть аккаунт? Войти в систему 
+	</a>
+</div>
+
+{% endblock %}

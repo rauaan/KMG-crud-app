@@ -26,7 +26,7 @@ def users():
     """
     if request.method == "GET":
         employees = User.query.all()
-    return render_template("main/index.html", employees=employees, company=Company)
+    return render_template("main/list_users.html", employees=employees, company=Company)
 
 
 @users_bp.route("/create", methods=["GET", "POST"])
