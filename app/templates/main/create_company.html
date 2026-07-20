@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 
-{% block body %}
+{% block content %}
 
-<h1>Добавить команию</h1>
+<h1 class="mb-6 text-center text-2xl font-bold">Добавить команию</h1>
 
-<form method="POST">
+<form method="POST" class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4 justify-center">
 
     <label>Название</label>
-    <input type="text" name="name" value="{{ company.name if company else '' }}" required>
+    <input type="text" name="name" value="{{ company.name if company else '' }}" required class="input">
 
     <label>Регион</label>
-    <input type="text" name="region" value="{{ company.region if company else '' }}" required>
+    <input type="text" name="region" value="{{ company.region if company else '' }}" required class="input">
 
-    <button type="submit">Сохранить</button>
+    <div></div>
+    <button type="submit" class="button button-primary">Сохранить</button>
 
 </form>
 

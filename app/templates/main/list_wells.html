@@ -1,74 +1,57 @@
 {% extends 'base.html' %}
 
-{% block head %}
-    <title>App</title> 
+{% block title %}
+    Скважины
 {% endblock %}
 
-{% block body %}
-
-    <main class="content">
-
-        <div class="data-row">
-            <h1>Данные</h1>
-            <form action="/upload" method="POST" enctype="multipart/form-data">
-                <label for = "upload" id="label-upload">Выберите файл</label>
-                <span id="file-name">-</span>
-                <input type="file" name="excel_file" accept=".xlsx,.xls" id="upload" required>
-                <button type="submit">Загрузить</button>
-            </form>
-
-            <form action="/download" method="GET" enctype="multipart/form-data">
-                <button type="submit">Скачать</button>
-            </form>
-        </div>           
+{% block content %}
+       
 
 
-        <div class="data-row">
-            <h1>Добавить</h1>
+    <div class="data-row">
+        <h1 class="font-semibold ">Скважины</h1>
 
-            <a href="{{ url_for('wells.create_well') }}">
-                <button>Добавить скважину</button>
+        <a href="{{ url_for('wells.create_well') }}">
+            <button class="button button-primary">Добавить скважину</button>
+        </a>
+    </div>
+
+    <div class="data-row data-grid-wells">
+        <div class="font-semibold">ID</div>
+        <div class="font-semibold">Название</div>
+        <div class="font-semibold">Тип</div>
+        <div class="font-semibold">Глубина</div>
+        <div class="font-semibold">Компания</div>
+        <div class="font-semibold text-center">Действия</div>
+    </div>
+
+    {% if wells | length < 1 %}
+    <h1> Нет Данных </h1>
+    {% else %}
+    {% for well in wells %}
+    <div class="data-row data-grid-wells">
+        <div>{{ well.id }}</div>
+        <div>{{ well.name }}</div>
+        <div>{{ well.type }}</div>
+        <div>{{ well.max_drilling_depth }}</div>
+        <div>{{ well.company.name}}</div>
+
+        <div class="flex gap-2 justify-end">
+            <a href="{{ url_for('wells.edit_well', id=well.id) }}">
+                <button class="button button-primary">Редактировать</button>
             </a>
+
+            <form action="{{ url_for('wells.delete_well', id=well.id) }}" method="POST">
+                <button
+                    class="button button-delete"
+                    onclick="return confirm('Вы уверены что хотите удалить скважину?')">
+                    Удалить
+                </button>
+            </form>
         </div>
+    </div>
+    {% endfor %}
+    {% endif %}
 
-        <div class="data-row">
-
-            <div class="data-info">
-                <span> <h2>ID</h2> </span>
-                <span> <h2>Название</h2> </span>
-                <span> <h2>Тип</h2> </span>
-                <span> <h2>Глубина</h2><h2> бурения</h2></span>
-                <span> <h2>Компания</h2></span>
-            </div>
-        </div>
-
-        {% if wells | length < 1 %}
-        <h1> Нет Данных </h1>
-        {% else %}
-        {% for well in wells %}
-        <div class="data-row">
-
-            <div class="data-info">
-                <span>{{ well.id }}</span>
-                <span>{{ well.name }}</span>
-                <span>{{ well.type }}</span>
-                <span>{{ well.max_drilling_depth }}</span>
-                <span>{{ company.query.get_or_404(well.oil_company_id).name }}</span>
-            </div>
-
-            <div class="data-actions">
-                <a href="{{ url_for('wells.edit_well', id=well['id']) }}" method="POST">
-                    <button class="info-btn"> Редактировать </button>
-                </a>
-                <form action="{{ url_for('wells.delete_well', id=well['id']) }}" method="POST">
-                    <button class="delete-btn" type="submit" onclick="return confirm('Вы уверены что хотите удалить скважину?');"> Удалить </button>
-                </form>
-            </div>
-
-        </div>
-        {% endfor %}
-        {% endif %}
-
-    </main> 
 
 {% endblock %}

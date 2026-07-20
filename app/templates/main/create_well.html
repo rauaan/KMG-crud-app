@@ -1,25 +1,26 @@
 {% extends 'base.html' %}
 
-{% block body %}
+{% block content %}
 
-<h1>Добавить  скважину</h1>
+<h1 class="mb-6 text-center text-2xl font-bold">Добавить  скважину</h1>
 
-<form method="POST">
+<form method="POST" class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4 justify-center">
 
     <label>Название</label>
-    <input type="text" name="name" value="{{ well.name if well else '' }}" required>
+    <input type="text" name="name" value="{{ well.name if well else '' }}" class="input" required>
 
     <label>Тип</label>
-    <input type="text" name="type" value="{{ well.type if well else '' }}"required>
+    <input type="text" name="type" value="{{ well.type if well else '' }}" class="input" required>
 
 
     <label>Максимальная глубина бурения</label>
-    <input type="text" name="max_drilling_depth" value = "{{ well.max_drilling_depth if well else '' }}"required>
+    <input type="text" name="max_drilling_depth" value = "{{ well.max_drilling_depth if well else '' }}" class="input" required>
 
     <label>Компания(id)</label>
-    <input type="text" name="company_id" value="{{ well.oil_company_id if well else '' }}" required>
+    <input type="text" name="company_id" value="{{ well.oil_company_id if well else '' }}" class="input" required>
 
-    <button type="submit">Сохранить</button>
+    <div></div>
+    <button type="submit" class="button button-primary">Сохранить</button>
 
 </form>
 
