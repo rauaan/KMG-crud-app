@@ -32,16 +32,9 @@
     </a>
 </div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="mx-auto mt-4 max-w-lg">
-            {% for category, message in messages %}
-                <div class="{{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
-
+<div class="text-center">
+    {% for error in form.username.errors%}
+        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}
+</div>
 {% endblock %}
