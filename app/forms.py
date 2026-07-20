@@ -7,7 +7,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, IntegerField, DateField
 from wtforms.validators import InputRequired, Length, ValidationError, NumberRange
-from app.models import Account, DailyProduction
+from app.models import Account, DailyProduction, Well
 
 
 class RegistrationForm(FlaskForm):
@@ -73,14 +73,14 @@ class CreateDailyProduction(FlaskForm):
     operating_hours = IntegerField(
         validators=[
             InputRequired(),
-            NumberRange(min=0, max=24, message="время работы 0-24ч"),
+            NumberRange(min=0, max=24, message="Время работы должно быть от 0ч до 24ч"),
         ]
     )
     liquid_produced = IntegerField(validators=[InputRequired()])
     water_cut = IntegerField(
         validators=[
             InputRequired(),
-            NumberRange(min=0, max=100, message="обводненность 0-100%%"),
+            NumberRange(min=0, max=100, message="Обводненность должна быть от 0%% до 100%%"),
         ]
     )
     density = IntegerField(validators=[InputRequired()])
@@ -138,3 +138,19 @@ class CreateDailyProduction(FlaskForm):
             return False
 
         return True
+    
+    def validate_well_id(self, field):
+        """Проверяет существование скважины.
+
+        Убеждается, что скважина с указанным идентификатором
+        существует в базе данных.
+
+        Args:
+            field: Поле формы с идентификатором скважины.
+
+        Raises:
+            ValidationError: Если скважина с указанным идентификатором
+                не существует.
+        """
+        if Well.query.get(field.data) is None:
+            raise ValidationError("Скважина с таким ID не существует.")

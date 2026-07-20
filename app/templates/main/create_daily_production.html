@@ -7,34 +7,54 @@
 <form method="POST" novalidate class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4 justify-center">
     {{ form.hidden_tag() }}
     <label>Скважина(id)</label>
-    {{ form.well_id(class="input") }}
+    <div>
+        {{ form.well_id(class="input") }}
 
+        {% for error in form.well_id.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+    </div>
 
     <label>Дата</label>
+    <div>
     {{ form.date(class="input") }}
-
+    {% for error in form.date.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}
+    </div>
 
     <label>Время работы</label>
+    <div>
     {{ form.operating_hours(class="input") }}
-
+    {% for error in form.operating_hours.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}
+    </div>
+    
     <label>Жидкость</label>
+    <div>
     {{ form.liquid_produced(class="input") }}
+    {% for error in form.liquid_produced.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}
+    </div>
 
     <label>Обводенность</label>
+    <div>
     {{ form.water_cut(class="input") }}
+    {% for error in form.water_cut.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}    
+    </div>
 
     <label>Плотность</label>
+    <div>
     {{ form.density(class="input") }}
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-		{% if messages %}
-			{% for category, message in messages %}
-				<div class="{{ category }}">
-					{{ message }}
-				</div>
-			{% endfor %}
-		{% endif %}
-	{% endwith %}
+    {% for error in form.density.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}
+    </div>
+
 
     <div></div>
     <button type="submit" class="button button-primary">Сохранить</button>
