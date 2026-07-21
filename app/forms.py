@@ -67,23 +67,23 @@ class CreateDailyProduction(FlaskForm):
     создание нескольких рапортов для одной и той же скважины в одну дату.
     """
 
-    well_id = IntegerField(validators=[InputRequired()])
-    date = DateField(validators=[InputRequired()])
+    well_id = IntegerField(validators=[InputRequired(message="Введите ID скважины")])
+    date = DateField(validators=[InputRequired(message="Введите дату")])
 
     operating_hours = IntegerField(
         validators=[
-            InputRequired(),
+            InputRequired(message="Введите время работы"),
             NumberRange(min=0, max=24, message="Время работы должно быть от 0ч до 24ч"),
         ]
     )
-    liquid_produced = IntegerField(validators=[InputRequired()])
+    liquid_produced = IntegerField(validators=[InputRequired("Введите объем добытой жидкости")])
     water_cut = IntegerField(
         validators=[
-            InputRequired(),
+            InputRequired("Введите обводенность"),
             NumberRange(min=0, max=100, message="Обводненность должна быть от 0%% до 100%%"),
         ]
     )
-    density = IntegerField(validators=[InputRequired()])
+    density = IntegerField(validators=[InputRequired("Введите плотность")])
 
     def __init__(self, *args, original_well_id=None, original_date=None, **kwargs):
         """Инициализирует форму.
@@ -134,7 +134,7 @@ class CreateDailyProduction(FlaskForm):
             return True
 
         if existing_report:
-            self.date.errors.append("Рапорт за этот день уже существует.")
+            self.date.errors.append("Рапорт за этот день уже существует")
             return False
 
         return True
@@ -153,4 +153,4 @@ class CreateDailyProduction(FlaskForm):
                 не существует.
         """
         if Well.query.get(field.data) is None:
-            raise ValidationError("Скважина с таким ID не существует.")
+            raise ValidationError("Скважина с таким ID не существует")

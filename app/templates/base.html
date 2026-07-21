@@ -5,37 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-
     <title>{% block title %}KMG{% endblock %}</title>
-
     {% block head %}{% endblock %}
 </head>
 
-<body class="min-h-screen flex">
+<body class="flex min-h-screen">
 
     {% block sidebar %}
-    <aside class="w-64 bg-gray-900 text-white p-0 m">
-        <nav class="bg-gray-900 text-white p-0" aria-hidden="true">
-            <div class="nav-bar-header">
-
-            </div>
-            <ul class="nav-list">
-                <li ><a href="{{ url_for('users.users') }}" class="nav-link">Сотрудники</a></li>
-                <li ><a href="{{ url_for('companies.companies') }}" class="nav-link">Компании</a></li>
-                <li ><a href="{{ url_for('wells.wells') }}" class="nav-link">Скважины</a></li>
-                <li ><a href="{{ url_for('daily_productions.daily_productions') }}" class="nav-link">Рапорты</a></li>
+    <aside class="sticky top-0 flex h-screen w-64 shrink-0 flex-col justify-between bg-gray-900 text-white">
+        <nav>
+            <div class="px-4 py-5 text-lg font-semibold tracking-tight">KMG</div>
+            <ul class="mt-2 space-y-0.5 px-2">
+                <li><a href="{{ url_for('users.users') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white">Сотрудники</a></li>
+                <li><a href="{{ url_for('companies.companies') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white">Компании</a></li>
+                <li><a href="{{ url_for('wells.wells') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white">Скважины</a></li>
+                <li><a href="{{ url_for('daily_productions.daily_productions') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white">Рапорты</a></li>
             </ul>
         </nav>
-        <a 
-        href="{{ url_for('auth.logout') }}" 
-        class="inline-block rounded-md px-3 py-2 transition-colors hover:bg-gray-700"
-            >Выйти
-        </a>
+        <a href="{{ url_for('auth.logout') }}" class="block border-t border-gray-800 px-4 py-3 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white">Выйти</a>
     </aside>
     {% endblock %}
-    
-    <main class="flex-1 p-6">
+
+    <main class="h-screen flex-1 overflow-y-auto p-6">
+        <div class="mx-auto max-w-7xl">
         {% block content %}{% endblock %}
+        </div>
     </main>
 
 </body>

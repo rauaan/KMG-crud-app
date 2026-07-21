@@ -1,64 +1,17 @@
 {% extends 'base.html' %}
+{% from "components/_ui.html" import form_card, wtf_field, form_actions %}
 
 {% block content %}
-
-<h1 class="mb-6 text-center text-2xl font-bold">Создать Рапорт</h1>
-
-<form method="POST" novalidate class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4 justify-center">
+{% call form_card("Создать рапорт") %}
+<form method="POST" novalidate class="space-y-5">
     {{ form.hidden_tag() }}
-    <label>Скважина(id)</label>
-    <div>
-        {{ form.well_id(class="input") }}
-
-        {% for error in form.well_id.errors %}
-            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-        {% endfor %}
-    </div>
-
-    <label>Дата</label>
-    <div>
-    {{ form.date(class="input") }}
-    {% for error in form.date.errors %}
-        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-    {% endfor %}
-    </div>
-
-    <label>Время работы</label>
-    <div>
-    {{ form.operating_hours(class="input") }}
-    {% for error in form.operating_hours.errors %}
-        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-    {% endfor %}
-    </div>
-    
-    <label>Жидкость</label>
-    <div>
-    {{ form.liquid_produced(class="input") }}
-    {% for error in form.liquid_produced.errors %}
-        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-    {% endfor %}
-    </div>
-
-    <label>Обводенность</label>
-    <div>
-    {{ form.water_cut(class="input") }}
-    {% for error in form.water_cut.errors %}
-        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-    {% endfor %}    
-    </div>
-
-    <label>Плотность</label>
-    <div>
-    {{ form.density(class="input") }}
-    {% for error in form.density.errors %}
-        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-    {% endfor %}
-    </div>
-
-
-    <div></div>
-    <button type="submit" class="button button-primary">Сохранить</button>
-
+    {{ wtf_field("Скважина (id)", form.well_id) }}
+    {{ wtf_field("Дата", form.date) }}
+    {{ wtf_field("Время работы", form.operating_hours) }}
+    {{ wtf_field("Жидкость", form.liquid_produced) }}
+    {{ wtf_field("Обводненность", form.water_cut) }}
+    {{ wtf_field("Плотность", form.density) }}
+    {{ form_actions(url_for('daily_productions.daily_productions')) }}
 </form>
-
+{% endcall %}
 {% endblock %}

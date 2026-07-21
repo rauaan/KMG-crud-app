@@ -1,57 +1,41 @@
 {% extends 'base.html' %}
+{% from "components/_ui.html" import page_header, btn, empty_state, data_table, td, td_num, icon_btn %}
 
-{% block title %}
-    Скважины
-{% endblock %}
+{% block title %}Скважины{% endblock %}
 
 {% block content %}
-       
+{% set icon_plus %}
+<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+{% endset %}
 
 
-    <div class="data-row">
-        <h1 class="font-semibold ">Скважины</h1>
-
-        <a href="{{ url_for('wells.create_well') }}">
-            <button class="button button-primary">Добавить скважину</button>
-        </a>
-    </div>
-
-    <div class="data-row data-grid-wells">
-        <div class="font-semibold">ID</div>
-        <div class="font-semibold">Название</div>
-        <div class="font-semibold">Тип</div>
-        <div class="font-semibold">Глубина</div>
-        <div class="font-semibold">Компания</div>
-        <div class="font-semibold text-center">Действия</div>
-    </div>
+    {% call page_header("Скважины", wells | length ~ " всего") %}
+        {{ btn(url_for('wells.create_well'), "Добавить скважину", "primary", icon_plus) }}
+    {% endcall %}
 
     {% if wells | length < 1 %}
-    <h1> Нет Данных </h1>
+        {{ empty_state("Пока нет скважин", "Добавьте первую, чтобы она появилась в списке") }}
     {% else %}
-    {% for well in wells %}
-    <div class="data-row data-grid-wells">
-        <div>{{ well.id }}</div>
-        <div>{{ well.name }}</div>
-        <div>{{ well.type }}</div>
-        <div>{{ well.max_drilling_depth }}</div>
-        <div>{{ well.company.name}}</div>
+        {% call(row) data_table(
+            ["ID", "Название", "Тип", "Глубина", "Компания", "Действия"],
+            align=['left', 'left', 'left', 'right', 'left', 'right']
+        ) %}
+            {% for well in wells %}
+            <tr class="hover:bg-slate-50">
+                {{ td(well.id, muted=True) }}
+                {{ td(well.name) }}
+                {{ td(well.type) }}
+                {{ td_num(well.max_drilling_depth) }}
+                {{ td(well.company.name) }}
+                <td class="px-3 py-2">
+                    <div class="flex justify-end gap-1">
+                        {{ icon_btn(url_for('wells.edit_well', id=well.id), "edit", "Редактировать") }}
+                        {{ icon_btn(url_for('wells.delete_well', id=well.id), "delete", "Удалить", method="POST", confirm="Вы уверены что хотите удалить скважину?") }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endcall %}
 
-        <div class="flex gap-2 justify-end">
-            <a href="{{ url_for('wells.edit_well', id=well.id) }}">
-                <button class="button button-primary">Редактировать</button>
-            </a>
-
-            <form action="{{ url_for('wells.delete_well', id=well.id) }}" method="POST">
-                <button
-                    class="button button-delete"
-                    onclick="return confirm('Вы уверены что хотите удалить скважину?')">
-                    Удалить
-                </button>
-            </form>
-        </div>
-    </div>
-    {% endfor %}
     {% endif %}
-
-
 {% endblock %}

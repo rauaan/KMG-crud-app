@@ -1,67 +1,37 @@
 {% extends 'base.html' %}
+{% from "components/_ui.html" import page_header, btn, empty_state, data_table, td, icon_btn %}
 
-{% block title %}
-    Сотрудники
-{% endblock %}
+{% block title %}Сотрудники{% endblock %}
 
 {% block content %}
-<!-- 
-
-    <div class="data-row">
-        <h1>Данные</h1>
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-            <label for = "upload" id="label-upload">Выберите файл</label>
-            <span id="file-name">-</span>
-            <input type="file" name="excel_file" accept=".xlsx,.xls" id="upload" required>
-            <button type="submit">Загрузить</button>
-        </form>
-
-        <form action="/download" method="GET" enctype="multipart/form-data">
-            <button type="submit">Скачать</button>
-        </form>
-    </div>            -->
+{% set icon_plus %}
+<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+{% endset %}
 
 
-    <div class="data-row">
-        <h1 class="font-semibold ">Сотрудники</h1>
-
-        <a href="{{ url_for('users.create_employee') }}">
-            <button class="button button-primary">Добавить сотрудника</button>
-        </a>
-    </div>
-
-
-    <div class="data-row data-grid-users">
-        <div class="font-semibold "> ID</h2> </div>
-        <div class="font-semibold "> Фамилия</h2> </div>
-        <div class="font-semibold "> Имя</h2> </div>
-        <div class="font-semibold "> Компания</h2> </div>
-        <div class="font-semibold ">Действия</div>
-    </div>
+    {% call page_header("Сотрудники", employees | length ~ " всего") %}
+        {{ btn(url_for('users.create_employee'), "Добавить сотрудника", "primary", icon_plus) }}
+    {% endcall %}
 
     {% if employees | length < 1 %}
-    <h1> Нет Данных </h1>
+        {{ empty_state("Пока нет сотрудников", "Добавьте первого, чтобы он появился в списке") }}
     {% else %}
-    {% for employee in employees %}
-    <div class="data-row data-grid-users">
-
-        <div>{{ employee.id }}</div>
-        <div>{{ employee.lName }}</div>
-        <div>{{ employee.fName }}</div>
-        <div>{{ employee.company.name }}</div>
-
-        <div class="flex gap-2 justify-end">
-            <a href="{{ url_for('users.edit_employee', id=employee['id']) }}" method="POST">
-                <button class="button button-primary"> Редактировать </button>
-            </a>
-            <form action="{{ url_for('users.delete_employee', id=employee['id']) }}" method="POST">
-                <button class="button button-delete" type="submit" onclick="return confirm('Вы уверены что хотите удалить сотрудника?');"> Удалить </button>
-            </form>
-        </div>
-
-    </div>
-    {% endfor %}
+        {% call(row) data_table(["ID", "Фамилия", "Имя", "Компания", "Действия"], align=['left', 'left', 'left', 'left', 'right']) %}
+            {% for employee in employees %}
+            <tr class="hover:bg-slate-50">
+                {{ td(employee.id, muted=True) }}
+                {{ td(employee.lName) }}
+                {{ td(employee.fName) }}
+                {{ td(employee.company.name) }}
+                <td class="px-3 py-2">
+                    <div class="flex justify-end gap-1">
+                        {{ icon_btn(url_for('users.edit_employee', id=employee['id']), "edit", "Редактировать") }}
+                        {{ icon_btn(url_for('users.delete_employee', id=employee['id']), "delete", "Удалить", method="POST", confirm="Вы уверены что хотите удалить сотрудника?") }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endcall %}
     {% endif %}
-
 
 {% endblock %}

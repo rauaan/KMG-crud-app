@@ -1,27 +1,14 @@
 {% extends 'base.html' %}
+{% from "components/_ui.html" import form_card, field, form_actions %}
 
 {% block content %}
-
-<h1 class="mb-6 text-center text-2xl font-bold">Добавить  скважину</h1>
-
-<form method="POST" class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4 justify-center">
-
-    <label>Название</label>
-    <input type="text" name="name" value="{{ well.name if well else '' }}" class="input" required>
-
-    <label>Тип</label>
-    <input type="text" name="type" value="{{ well.type if well else '' }}" class="input" required>
-
-
-    <label>Максимальная глубина бурения</label>
-    <input type="text" name="max_drilling_depth" value = "{{ well.max_drilling_depth if well else '' }}" class="input" required>
-
-    <label>Компания(id)</label>
-    <input type="text" name="company_id" value="{{ well.oil_company_id if well else '' }}" class="input" required>
-
-    <div></div>
-    <button type="submit" class="button button-primary">Сохранить</button>
-
+{% call form_card("Добавить скважину") %}
+<form method="POST" class="space-y-5">
+    {{ field("Название", "name", well.name if well else '') }}
+    {{ field("Тип", "type", well.type if well else '') }}
+    {{ field("Максимальная глубина бурения", "max_drilling_depth", well.max_drilling_depth if well else '') }}
+    {{ field("Компания (id)", "company_id", well.oil_company_id if well else '') }}
+    {{ form_actions(url_for('wells.wells')) }}
 </form>
-
+{% endcall %}
 {% endblock %}
