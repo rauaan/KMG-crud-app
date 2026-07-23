@@ -1,0 +1,175 @@
+{% macro page_header(title, subtitle=None) %}
+<div class="flex items-center justify-between border-b border-slate-200 pb-5 mb-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-slate-900">{{ title }}</h1>
+        {% if subtitle %}
+        <p class="mt-1 text-sm text-slate-500">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+    {{ caller() if caller }}
+</div>
+{% endmacro %}
+
+{% macro btn(href, label, variant="primary", icon=None) %}
+{% set styles = {
+    "primary": "bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600",
+    "outline": "bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus-visible:outline-indigo-600",
+    "danger":  "bg-white text-red-600 ring-1 ring-inset ring-red-200 hover:bg-red-50 focus-visible:outline-red-600"
+} %}
+<a href="{{ href }}"
+   class="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 {{ styles[variant] }}">
+    {% if icon %}{{ icon | safe }}{% endif %}
+    {{ label }}
+</a>
+{% endmacro %}
+
+{% macro btn_submit(label, variant="danger", icon=None, confirm=None) %}
+{% set styles = {
+    "primary": "bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600",
+    "outline": "bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus-visible:outline-indigo-600",
+    "danger":  "bg-white text-red-600 ring-1 ring-inset ring-red-200 hover:bg-red-50 focus-visible:outline-red-600"
+} %}
+<button type="submit"
+    {% if confirm %}onclick="return confirm('{{ confirm }}');"{% endif %}
+    class="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 {{ styles[variant] }}">
+    {% if icon %}{{ icon | safe }}{% endif %}
+    {{ label }}
+</button>
+{% endmacro %}
+
+{% macro empty_state(title, subtitle=None) %}
+<div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 py-16 text-center">
+    <svg class="h-10 w-10 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 7h18M3 12h18M3 17h10" stroke-linecap="round"/>
+    </svg>
+    <p class="mt-3 text-sm font-medium text-slate-700">{{ title }}</p>
+    {% if subtitle %}
+    <p class="mt-1 text-sm text-slate-400">{{ subtitle }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro data_table(headers, align=None) %}
+{% set align = align or (['left'] * (headers | length - 1) + ['right']) %}
+<div class="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="sticky top-0 z-10 bg-slate-50">
+                <tr>
+                    {% for h in headers %}
+                    <th class="whitespace-nowrap px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500
+                        {{ 'text-right' if align[loop.index0] == 'right' else 'text-left' }}">
+                        {{ h }}
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {{ caller() }}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro td(value, muted=False) %}
+<td class="whitespace-nowrap px-3 py-2 text-sm {{ 'text-slate-400' if muted else 'text-slate-700' }}">{{ value }}</td>
+{% endmacro %}
+
+{% macro icon_btn(action_url, variant, title, method="GET", confirm=None) %}
+{% set styles = {
+    "edit":   "text-slate-500 hover:bg-slate-100 hover:text-slate-700",
+    "delete": "text-slate-500 hover:bg-red-50 hover:text-red-600"
+} %}
+{% set icons = {
+    "edit": '<path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>',
+    "delete": '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round"/>'
+} %}
+{% if method == "POST" %}
+<form action="{{ action_url }}" method="POST">
+    <button type="submit" title="{{ title }}" aria-label="{{ title }}"
+        {% if confirm %}onclick="return confirm('{{ confirm }}');"{% endif %}
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors {{ styles[variant] }}">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{{ icons[variant] | safe }}</svg>
+    </button>
+</form>
+{% else %}
+<a href="{{ action_url }}" title="{{ title }}" aria-label="{{ title }}"
+    class="inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors {{ styles[variant] }}">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{{ icons[variant] | safe }}</svg>
+</a>
+{% endif %}
+{% endmacro %}
+
+{% macro td_num(value, muted=False) %}
+<td class="whitespace-nowrap px-3 py-2 text-right text-sm tabular-nums {{ 'text-slate-400' if muted else 'text-slate-700' }}">{{ value }}</td>
+{% endmacro %}
+
+{% macro form_card(title, subtitle=None) %}
+<div class="mx-auto max-w-xl">
+    <div class="mb-6 text-center">
+        <h1 class="text-2xl font-semibold text-slate-900">{{ title }}</h1>
+        {% if subtitle %}<p class="mt-1 text-sm text-slate-500">{{ subtitle }}</p>{% endif %}
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="space-y-5">
+            {{ caller() }}
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro field(label, name, value='', type='text', required=True) %}
+<div>
+    <label for="{{ name }}" class="mb-1.5 block text-sm font-medium text-slate-700">{{ label }}</label>
+    <input type="{{ type }}" name="{{ name }}" id="{{ name }}" value="{{ value }}"
+        {% if required %}required{% endif %}
+        class="w-full p-2 border border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 ">
+</div>
+{% endmacro %}
+
+{% macro wtf_field(label, form_field, muted=False) %}
+<div>
+    <label for="{{ form_field.id }}" class="mb-1.5 block text-sm font-medium text-slate-700">{{ label }}</label>
+    {{ form_field(class="w-full p-2 border border-gray-300 text-sm shadow-sm focus:ring-1 " ~ ("border-red-300 focus:border-red-500 focus:ring-red-500" if form_field.errors else "border-slate-300 focus:border-indigo-500 focus:ring-indigo-500")) }}
+    {% for error in form_field.errors %}
+    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro form_actions(cancel_url) %}
+<div class="mt-1 flex justify-end gap-2 border-t border-slate-100 pt-5">
+    <a href="{{ cancel_url }}" class="inline-flex items-center rounded-lg px-3.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50">Отмена</a>
+    <button type="submit" class="inline-flex items-center rounded-lg bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Сохранить</button>
+</div>
+{% endmacro %}
+
+{% macro auth_background() %}
+<div class="fixed inset-0 -z-10 overflow-hidden bg-slate-950">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(79,70,229,0.25),transparent_45%),radial-gradient(circle_at_85%_80%,rgba(217,119,6,0.18),transparent_50%)]"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:48px_48px]"></div>
+    <svg class="absolute bottom-0 left-0 h-64 w-full text-white/[0.06]" viewBox="0 0 1200 300" fill="none" preserveAspectRatio="xMidYMax slice">
+        <path d="M120 300V60l40-40 40 40v240M100 120h120M90 180h140M80 240h160" stroke="currentColor" stroke-width="2"/>
+        <path d="M950 300V90l30-30 30 30v210M925 160h110M905 210h150M885 260h190" stroke="currentColor" stroke-width="2"/>
+        <path d="M0 300h1200" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="620" cy="150" r="1.5" fill="currentColor"/>
+        <circle cx="700" cy="220" r="1.5" fill="currentColor"/>
+        <circle cx="450" cy="190" r="1.5" fill="currentColor"/>
+    </svg>
+</div>
+{% endmacro %}
+
+{% macro auth_card(title) %}
+<div class="flex min-h-[85vh] items-center justify-center">
+    <div class="w-full max-w-sm">
+        <div class="mb-6 text-center">
+            <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-lg shadow-indigo-600/30">K</div>
+            <h1 class="text-xl font-semibold text-white">{{ title }}</h1>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/95 p-6 shadow-2xl backdrop-blur">
+            {{ caller() }}
+        </div>
+    </div>
+</div>
+{% endmacro %}

@@ -1,24 +1,13 @@
 {% extends 'base.html' %}
+{% from "components/_ui.html" import form_card, field, form_actions %}
 
 {% block content %}
-
-<h1 class="mb-6 text-center text-2xl font-bold"> Добавить сотрудника</h1>
-
-<form method="POST" class="mx-auto grid max-w-lg grid-cols-[140px_1fr] gap-4 justify-center">
-
-    <label>Фамилия</label>
-    <input type="text" name="lName" value="{{ employee.lName if employee else '' }}" class="input" required>
-
-    <label>Имя</label>
-    <input type="text" name="fName" value="{{ employee.fName if employee else '' }}" class="input" required>
-    <!-- " -->
-
-    <label>Компания(id)</label>
-    <input type="text" name="company_id" value="{{ employee.oil_company_id if employee else '' }}" class="input" required>
-
-    <div></div>
-    <button type="submit" class="button button-primary">Сохранить</button>
-
+{% call form_card("Добавить сотрудника") %}
+<form method="POST" class="space-y-5">
+    {{ field("Фамилия", "lName", employee.lName if employee else '') }}
+    {{ field("Имя", "fName", employee.fName if employee else '') }}
+    {{ field("Компания (id)", "company_id", employee.oil_company_id if employee else '') }}
+    {{ form_actions(url_for('users.users')) }}
 </form>
-
+{% endcall %}
 {% endblock %}

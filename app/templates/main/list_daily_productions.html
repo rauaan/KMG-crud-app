@@ -1,73 +1,42 @@
 {% extends 'base.html' %}
+{% from "components/_ui.html" import page_header, btn, empty_state, data_table, td, td_num, icon_btn %}
 
-{% block title %}
-    Рапорты
-{% endblock %}
+{% block title %}Рапорты{% endblock %}
 
-{% block content %}           
-
-
-    <div class="data-row">
-        <h1 class="font-semibold ">Рапорты</h1>
-
-        <a href="{{ url_for('daily_productions.create_daily_production') }}">
-            <button class="button button-primary">Создать рапорт</button>
-        </a>
-    </div>
+{% block content %}
+{% set icon_plus %}
+<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+</svg>
+{% endset %}
 
 
-    <div class="data-row data-grid-report">
-        <div class="font-semibold">Скважина (ID)</div>
-        <div class="font-semibold">Дата</div>
-        <div class="font-semibold">Время работы</div>
-        <div class="font-semibold">Жидкость</div>
-        <div class="font-semibold">Обводенность</div>
-        <div class="font-semibold">Плотность</div>
-        <div class="font-semibold">Чистая нефть</div>
-        <div class="font-semibold text-center">Действия</div>
-    </div>
-
+    {% call page_header("Рапорты", reports | length ~ " всего") %}
+        {{ btn(url_for('daily_productions.create_daily_production'), "Создать рапорт", "primary", icon_plus) }}
+    {% endcall %}
 
     {% if reports | length < 1 %}
-    <h1> Нет Данных </h1>
+        {{ empty_state("Пока нет рапортов", "Создайте первый, чтобы он появился здесь") }}
     {% else %}
-    {% for report in reports %}
-    <div class="data-row data-grid-report">
-
-        <div>{{ report.well_id }}</div>
-        <div>{{ report.date }}</div>
-        <div>{{ report.operating_hours }}</div>
-        <div>{{ report.liquid_produced }}</div>
-        <div>{{ report.water_cut }}</div>
-        <div>{{ report.density }}</div>
-        <div>{{ "%.2f"|format(report.net_oil) }}</div>
-    
-
-        <div class="flex justify-end gap-2">
-            <a href="{{ url_for('daily_productions.edit_daily_production',
-                well_id=report.well_id,
-                date=report.date) }}">
-                <button class="button button-primary">
-                    Редактировать
-                </button>
-            </a>
-
-            <form action="{{ url_for('daily_productions.delete_daily_production',
-                well_id=report.well_id,
-                date=report.date) }}"
-                method="POST">
-
-                <button
-                    class="button button-delete"
-                    onclick="return confirm('Вы уверены что хотите удалить рапорт?')">
-                    Удалить
-                </button>
-            </form>
-        </div>
-
-    </div>
-    {% endfor %}
+        {% call(row) data_table(["Скважина", "Дата", "Часы", "Жидкость", "Обв. %", "Плотность", "Нефть, т", "Действия"], align=['left', 'left', 'right', 'right', 'right', 'right', 'right', 'right']) %}
+            {% for report in reports %}
+            <tr class="hover:bg-slate-50">
+                {{ td(report.well_id, muted=True) }}
+                {{ td(report.date) }}
+                {{ td_num(report.operating_hours) }}
+                {{ td_num(report.liquid_produced) }}
+                {{ td_num(report.water_cut) }}
+                {{ td_num(report.density) }}
+                {{ td_num("%.2f"|format(report.net_oil)) }}
+                <td class="px-3 py-2">
+                    <div class="flex justify-end gap-1">
+                        {{ icon_btn(url_for('daily_productions.edit_daily_production', well_id=report.well_id, date=report.date), "edit", "Редактировать") }}
+                        {{ icon_btn(url_for('daily_productions.delete_daily_production', well_id=report.well_id, date=report.date), "delete", "Удалить", method="POST", confirm="Вы уверены что хотите удалить рапорт?") }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endcall %}
     {% endif %}
 
-
-{% endblock %}   
+{% endblock %}

@@ -1,50 +1,36 @@
 {% extends "base.html" %}
+{% from "components/_ui.html" import page_header, btn, empty_state, data_table, td, icon_btn %}
 
-{% block title %}
-Компании
-{% endblock %}
+{% block title %}Компании{% endblock %}
 
-{% block content %}         
-
-
-        <div class="data-row">
-            <h1 class="font-semibold ">Компании</h1>
-
-            <a href="{{ url_for('companies.create_company') }}">
-                <button class="button button-primary">Добавить компанию</button>
-            </a>
-        </div>
+{% block content %}
+{% set icon_plus %}
+<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+{% endset %}
 
 
-        <div class="data-row data-grid-companies">
-            <div class="font-semibold "> ID </div>
-            <div class="font-semibold "> Название </div>
-            <div class="font-semibold "> Регион </div>
-            <div class="font-semibold ">Действия</div>
-        </div>
+    {% call page_header("Компании", companies | length ~ " всего") %}
+        {{ btn(url_for('companies.create_company'), "Добавить компанию", "primary", icon_plus) }}
+    {% endcall %}
 
-
-        {% if companies | length < 1 %}
-        <h1> Нет Данных </h1>
-        {% else %}
-        {% for company in companies %}
-        <div class="data-row data-grid-companies">
-            <div>{{ company.id }}</div>
-            <div>{{ company.name }}</div>
-            <div>{{ company.region }}</div>
-
-            <div class="flex gap-2 justify-end">
-                <a href="{{ url_for('companies.edit_company', id=company['id']) }}" method="POST">
-                    <button class="button button-primary"> Редактировать </button>
-                </a>
-                <form action="{{ url_for('companies.delete_company', id=company['id']) }}" method="POST">
-                    <button class="button button-delete" type="submit" onclick="return confirm('Вы уверены что хотите удалить сотрудника?');"> Удалить </button>
-                </form>
-            </div>
-
-        </div>
-        {% endfor %}
-        {% endif %}
-
+    {% if companies | length < 1 %}
+        {{ empty_state("Пока нет компаний", "Добавьте первую, чтобы она появилась в списке") }}
+    {% else %}
+        {% call(row) data_table(["ID", "Название", "Регион", "Действия"], align=['left', 'left', 'left', 'right']) %}
+            {% for company in companies %}
+            <tr class="hover:bg-slate-50">
+                {{ td(company.id, muted=True) }}
+                {{ td(company.name) }}
+                {{ td(company.region) }}
+                <td class="px-3 py-2">
+                    <div class="flex justify-end gap-1">
+                        {{ icon_btn(url_for('companies.edit_company', id=company['id']), "edit", "Редактировать") }}
+                        {{ icon_btn(url_for('companies.delete_company', id=company['id']), "delete", "Удалить", method="POST", confirm="Вы уверены что хотите удалить компанию?") }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endcall %}
+    {% endif %}
 
 {% endblock %}
