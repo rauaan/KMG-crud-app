@@ -56,6 +56,19 @@
                     Рапорты
                 </a>
             </li>
+            <li>
+                <a href="{{ url_for('dashboards.dashboards') }}"
+                   class="flex items-center gap-5 rounded-lg px-3 py-2 text-sm transition-colors
+                       {{ 'bg-gray-800 text-white' if request.endpoint and request.endpoint.startswith('dashboards.') else 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
+                   <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M3 13h8V3H3zM13 21h8v-6h-8zM13 3h8v8h-8zM3 21h8v-4H3z"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"/>
+                    </svg>
+                    Dashboards
+                </a>
+            </li>
         </ul>
     </nav>
     <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-5 border-t border-gray-800 px-4 py-3 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white">

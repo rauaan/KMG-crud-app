@@ -41,6 +41,7 @@ def create_app():
         companies_bp,
         wells_bp,
         daily_productions_bp,
+        dashboards_bp
     )
 
     app.register_blueprint(users_bp, url_prefix="/users")
@@ -48,6 +49,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(wells_bp, url_prefix="/wells")
     app.register_blueprint(daily_productions_bp, url_prefix="/daily_productions")
+    app.register_blueprint(dashboards_bp, url_prefix="/dashboards")
 
     @app.route("/", methods=["GET"])
     @login_required

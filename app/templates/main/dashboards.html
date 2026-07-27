@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% block title %}Дашборд добычи{% endblock %}
+{% block content %}
+<div class="w-full py-2">
+
+  <!-- =========================================================
+       FILTERS
+  ========================================================== -->
+  <form method="get" class="flex flex-wrap items-end gap-3 mb-4" id="filtersForm">
+    <div class="flex flex-col">
+      <label for="company_id" class="mb-1 text-xs font-medium text-gray-500">Компания (ДЗО)</label>
+      <select name="company_id" id="company_id" onchange="onCompanyChange()"
+              class="w-48 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm
+                     focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <option value="">Все компании</option>
+        {% for c in companies %}
+          <option value="{{ c.id }}" {% if selected_company == c.id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="well_id" class="mb-1 text-xs font-medium text-gray-500">Скважина</label>
+      <select name="well_id" id="well_id"
+              class="w-48 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm
+                     focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <option value="">Все скважины</option>
+        {% for w in wells %}
+          <option value="{{ w.id }}" {% if selected_well == w.id %}selected{% endif %}>{{ w.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button type="submit"
+              class="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white shadow-sm
+                     hover:bg-blue-700 transition-colors">
+        Применить
+      </button>
+      {% if selected_company or selected_well %}
+        <a href="{{ url_for('dashboards.dashboards') }}"
+           class="rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-600
+                  hover:bg-gray-50 transition-colors">
+          Сбросить
+        </a>
+      {% endif %}
+    </div>
+  </form>
+
+  <script>
+    // resets well filter automatically when company changes, since the well list is company-dependent
+    function onCompanyChange() {
+      document.getElementById('well_id').value = "";
+    }
+  </script>
+
+  <!-- =========================================================
+       CONTEXT BANNER — makes it unmistakably clear whether the
+       numbers below are global or scoped to a company/well
+  ========================================================== -->
+  {% if selected_well %}
+    <div class="mb-6 flex items-center gap-2 rounded-md bg-blue-50 px-4 py-2.5 text-sm text-blue-800">
+      <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 21s-7-6.5-7-11a7 7 0 1114 0c0 4.5-7 11-7 11z" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="10" r="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        Показаны данные по скважине
+        <strong class="font-semibold">
+          {% for w in wells %}{% if w.id == selected_well %}{{ w.name }}{% endif %}{% endfor %}
+        </strong>
+      </div>
+    </div>
+  {% elif selected_company %}
+    <div class="mb-6 flex items-center gap-2 rounded-md bg-blue-50 px-4 py-2.5 text-sm text-blue-800">
+      <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 21h18M6 21V7l6-4 6 4v14M9 9h1M9 13h1M14 9h1M14 13h1M10 21v-4h4v4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        Показаны данные по компании
+        <strong class="font-semibold">
+          {% for c in companies %}{% if c.id == selected_company %}{{ c.name }}{% endif %}{% endfor %}
+        </strong>
+      </div>
+    </div>
+  {% else %}
+    <div class="mb-6 flex items-center gap-2 rounded-md bg-gray-100 px-4 py-2.5 text-sm text-gray-700">
+      <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>Показаны сводные данные по <strong class="font-semibold">всем компаниям и скважинам</strong></div>
+    </div>
+  {% endif %}
+
+  <!-- =========================================================
+       KPI CARDS
+  ========================================================== -->
+  <div class="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+    <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-xs text-gray-500">Компаний</div>
+      <div class="mt-1 text-xl font-semibold text-gray-900">{{ companies_count }}</div>
+    </div>
+    <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-xs text-gray-500">{% if selected_company %}Скважин компании{% else %}Скважин{% endif %}</div>
+      <div class="mt-1 text-xl font-semibold text-gray-900">{{ wells_count }}</div>
+    </div>
+    <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-xs text-gray-500">Рапортов</div>
+      <div class="mt-1 text-xl font-semibold text-gray-900">{{ reports_count }}</div>
+    </div>
+    <div class="rounded-lg border border-blue-200 bg-white p-4 shadow-sm">
+      <div class="text-xs text-gray-500">Чистая нефть, т</div>
+      <div class="mt-1 text-xl font-semibold text-blue-600">{{ "%.1f"|format(total_net_oil) }}</div>
+    </div>
+    <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-xs text-gray-500">Ср. обводнённость</div>
+      <div class="mt-1 text-xl font-semibold text-gray-900">{{ "%.1f"|format(avg_water_cut) }}%</div>
+    </div>
+    <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-xs text-gray-500">Ср. дебит жидкости</div>
+      <div class="mt-1 text-xl font-semibold text-gray-900">{{ "%.1f"|format(avg_liquid) }}</div>
+    </div>
+  </div>
+
+  {% if not selected_company and not selected_well %}
+  <!-- Leader cards only make sense in the general (unfiltered) view -->
+  <div class="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2">
+    <div class="rounded-lg bg-gray-50 border border-gray-200 p-4">
+      <div class="text-xs text-gray-500">Лидер по добыче — компания</div>
+      <div class="mt-1 text-lg font-semibold text-gray-900">{{ top_company_name }}</div>
+      <div class="text-sm text-gray-500">{{ "%.1f"|format(top_company_oil) }} т чистой нефти</div>
+    </div>
+    <div class="rounded-lg bg-gray-50 border border-gray-200 p-4">
+      <div class="text-xs text-gray-500">Лидер по добыче — скважина</div>
+      <div class="mt-1 text-lg font-semibold text-gray-900">{{ top_well_name }}</div>
+      <div class="text-sm text-gray-500">{{ "%.1f"|format(top_well_oil) }} т чистой нефти</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- =========================================================
+       CHARTS
+  ========================================================== -->
+  <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+
+    <!-- 1. Production over time -->
+    <div class="xl:col-span-8 rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div class="border-b border-gray-100 px-4 py-3">
+        <strong class="text-sm font-semibold text-gray-900">Динамика добычи чистой нефти</strong>
+        <span class="ml-1 text-xs text-gray-500">
+          {% if selected_well %}— выбранная скважина{% elif selected_company %}— выбранная компания{% else %}— все компании{% endif %}
+        </span>
+      </div>
+      <div class="p-4" style="height: 360px;">
+        <canvas id="productionChart"></canvas>
+      </div>
+    </div>
+
+    <!-- 2. Well fund distribution by type -->
+    <div class="xl:col-span-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div class="border-b border-gray-100 px-4 py-3">
+        <strong class="text-sm font-semibold text-gray-900">Распределение фонда скважин</strong>
+        <span class="ml-1 text-xs text-gray-500">по типу</span>
+      </div>
+      <div class="flex items-center justify-center p-4" style="height: 360px;">
+        <canvas id="wellTypeChart"></canvas>
+      </div>
+    </div>
+
+    <!-- 3. Water cut comparison between wells -->
+    <div class="xl:col-span-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div class="border-b border-gray-100 px-4 py-3">
+        <strong class="text-sm font-semibold text-gray-900">Обводнённость по скважинам</strong>
+        <span class="ml-1 text-xs text-gray-500">
+          {% if selected_company %}сравнение внутри выбранной компании{% else %}по всем скважинам{% endif %}
+        </span>
+      </div>
+      <div class="p-4" style="height: 360px;">
+        <canvas id="waterCutChart"></canvas>
+      </div>
+    </div>
+
+    <!-- 4. Production breakdown: by company (general) or by well (when company selected) -->
+    <div class="xl:col-span-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div class="border-b border-gray-100 px-4 py-3">
+        {% if selected_company %}
+          <strong class="text-sm font-semibold text-gray-900">Добыча по скважинам компании</strong>
+        {% else %}
+          <strong class="text-sm font-semibold text-gray-900">Добыча по компаниям</strong>
+        {% endif %}
+        <span class="ml-1 text-xs text-gray-500">чистая нефть, т</span>
+      </div>
+      <div class="p-4" style="height: 360px;">
+        <canvas id="breakdownChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const PALETTE = ['#2f6feb', '#22a06b', '#f5a623', '#e8543f', '#8a5fe0', '#17a2b8', '#6c757d', '#d63384'];
+  Chart.defaults.font.family = "'Inter','Segoe UI',sans-serif";
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.cornerRadius = 6;
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.responsive = true;
+  Chart.defaults.maintainAspectRatio = false;
+
+  // -------- data passed in from Flask/Jinja --------
+  const productionLabels = {{ production_labels|tojson }};
+  const productionValues = {{ production_values|tojson }};
+  const waterLabels = {{ water_labels|tojson }};
+  const waterValues = {{ water_values|tojson }};
+  const wellTypeLabels = {{ well_type_labels|tojson }};
+  const wellTypeValues = {{ well_type_values|tojson }};
+
+  {% if selected_company %}
+    const breakdownLabels = {{ well_labels|tojson }};
+    const breakdownValues = {{ well_values|tojson }};
+    const breakdownIds = {{ well_ids|tojson }};
+  {% else %}
+    const breakdownLabels = {{ company_labels|tojson }};
+    const breakdownValues = {{ company_values|tojson }};
+    const breakdownIds = {{ company_ids|tojson }};
+  {% endif %}
+
+  // -------- 1. Production over time (line) --------
+  new Chart(document.getElementById('productionChart'), {
+    type: 'line',
+    data: {
+      labels: productionLabels,
+      datasets: [{
+        label: 'Чистая нефть, т',
+        data: productionValues,
+        borderColor: PALETTE[0],
+        backgroundColor: 'rgba(47,111,235,0.12)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+      }]
+    },
+    options: {
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `Чистая нефть: ${ctx.parsed.y.toLocaleString('ru-RU', {maximumFractionDigits: 1})} т`
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 45, minRotation: 0 } },
+        y: { title: { display: true, text: 'т' } }
+      }
+    }
+  });
+
+  // -------- 2. Well type distribution (doughnut) --------
+  new Chart(document.getElementById('wellTypeChart'), {
+    type: 'doughnut',
+    data: {
+      labels: wellTypeLabels,
+      datasets: [{
+        data: wellTypeValues,
+        backgroundColor: PALETTE,
+        borderWidth: 2,
+        borderColor: '#fff',
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = total ? (ctx.parsed / total * 100).toFixed(1) : 0;
+              return `${ctx.label}: ${ctx.parsed} (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // -------- 3. Water cut by well (bar) --------
+  new Chart(document.getElementById('waterCutChart'), {
+    type: 'bar',
+    data: {
+      labels: waterLabels,
+      datasets: [{
+        label: 'Обводнённость, %',
+        data: waterValues,
+        backgroundColor: waterValues.map(v => v >= 70 ? '#e8543f' : v >= 40 ? '#f5a623' : '#22a06b'),
+        borderRadius: 4,
+        maxBarThickness: 40,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `Обводнённость: ${ctx.parsed.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 45, minRotation: 0 } },
+        y: { beginAtZero: true, max: 100, title: { display: true, text: '%' } }
+      }
+    }
+  });
+
+  // -------- 4. Breakdown: companies or wells within a company (bar) --------
+  new Chart(document.getElementById('breakdownChart'), {
+    type: 'bar',
+    data: {
+      labels: breakdownLabels,
+      datasets: [{
+        label: 'Чистая нефть, т',
+        data: breakdownValues,
+        backgroundColor: PALETTE[1],
+        borderRadius: 4,
+        maxBarThickness: 40,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.parsed.x.toLocaleString('ru-RU', {maximumFractionDigits: 1})} т`
+          }
+        }
+      },
+      scales: {
+        x: { beginAtZero: true, title: { display: true, text: 'т' } }
+      },
+      onClick: (evt, elements) => {
+        // clicking a bar drills down: company -> filters by that company,
+        // well -> filters by that well
+        if (!elements.length) return;
+        const idx = elements[0].index;
+        const id = breakdownIds[idx];
+        {% if selected_company %}
+          window.location = `{{ url_for('dashboards.dashboards') }}?company_id={{ selected_company }}&well_id=${id}`;
+        {% else %}
+          window.location = `{{ url_for('dashboards.dashboards') }}?company_id=${id}`;
+        {% endif %}
+      }
+    }
+  });
+</script>
+{% endblock %}
