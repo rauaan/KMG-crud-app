@@ -12,7 +12,7 @@ from app.config import Config
 from app.seed import make_data
 
 
-def create_app():
+def create_app(config_overrides=None):
     """Создает и настраивает экземпляр Flask-приложения.
 
     Выполняет следующие действия:
@@ -28,6 +28,10 @@ def create_app():
 
     app = Flask(__name__)
     app.config.from_object(Config)
+    
+    if config_overrides:
+            app.config.update(config_overrides)
+
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
