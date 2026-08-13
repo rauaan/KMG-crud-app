@@ -4,39 +4,265 @@
 {% block title %}Рапорты{% endblock %}
 
 {% block content %}
+
 {% set icon_plus %}
-<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<svg class="h-4 w-4"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2">
     <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
 </svg>
 {% endset %}
 
 
-    {% call page_header("Рапорты", reports | length ~ " всего") %}
-        {{ btn(url_for('daily_productions.create_daily_production'), "Создать рапорт", "primary", icon_plus) }}
-    {% endcall %}
+{% call page_header("Рапорты", reports | length ~ " всего") %}
 
-    {% if reports | length < 1 %}
-        {{ empty_state("Пока нет рапортов", "Создайте первый, чтобы он появился здесь") }}
-    {% else %}
-        {% call(row) data_table(["Скважина", "Дата", "Часы", "Жидкость", "Обв. %", "Плотность", "Нефть, т", "Действия"], align=['left', 'left', 'right', 'right', 'right', 'right', 'right', 'right']) %}
-            {% for report in reports %}
+    <div class="flex items-center gap-2">
+
+        {{ btn(
+            url_for('daily_productions.create_daily_production'),
+            "Создать рапорт",
+            "primary",
+            icon_plus
+        ) }}
+
+        <!-- Excel -->
+        <details class="relative">
+
+            <summary
+                class="inline-flex cursor-pointer list-none items-center rounded-lg
+                    border border-slate-300 bg-white px-3.5 py-2
+                    text-sm font-medium text-slate-700 shadow-sm
+                    transition-colors hover:bg-slate-50"
+            >
+                Excel
+
+                <svg class="ml-1.5 h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <path d="m6 9 6 6 6-6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+                </svg>
+            </summary>
+
+                <div
+                    class="absolute right-0 mt-2 w-80
+                        rounded-xl border border-slate-200
+                        bg-white p-4 shadow-xl"
+                    style="z-index: 9999; isolation: isolate;"
+                >
+
+                <!-- IMPORT -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for('daily_productions.upload_daily_productions') }}"
+                    enctype="multipart/form-data"
+                    class="border-b border-slate-200 pb-4"
+                >
+
+                    <h3 class="mb-1 text-sm font-semibold text-slate-800">
+                        Импорт рапортов
+                    </h3>
+
+                    <p class="mb-3 text-xs text-slate-500">
+                        Загрузите Excel-файл с рапортами.
+                    </p>
+
+                    <input
+                        type="file"
+                        name="file"
+                        accept=".xlsx"
+                        required
+                        class="block w-full text-sm text-slate-600
+                            file:mr-3 file:rounded-lg
+                            file:border-0 file:bg-slate-100
+                            file:px-3 file:py-2
+                            file:text-sm file:font-medium
+                            file:text-slate-700
+                            hover:file:bg-slate-200"
+                    >
+
+                    <button
+                        type="submit"
+                        class="mt-3 w-full rounded-lg
+                            bg-slate-800 px-3 py-2
+                            text-sm font-medium text-white
+                            transition-colors hover:bg-slate-700"
+                    >
+                        Импортировать
+                    </button>
+
+                </form>
+
+
+                <!-- EXPORT -->
+
+                <form
+                    method="GET"
+                    action="{{ url_for('daily_productions.download_daily_productions') }}"
+                    class="pt-4"
+                >
+
+                    <h3 class="mb-1 text-sm font-semibold text-slate-800">
+                        Экспорт рапортов
+                    </h3>
+
+                    <p class="mb-3 text-xs text-slate-500">
+                        Оставьте даты пустыми, чтобы скачать все рапорты.
+                    </p>
+
+                    <div class="space-y-3">
+
+                        <div>
+                            <label
+                                for="date_from"
+                                class="mb-1 block text-xs font-medium text-slate-600"
+                            >
+                                С
+                            </label>
+
+                            <input
+                                type="date"
+                                id="date_from"
+                                name="date_from"
+                                class="w-full rounded-lg border border-slate-300
+                                    px-2 py-2 text-sm text-slate-700
+                                    focus:border-indigo-500
+                                    focus:ring-1 focus:ring-indigo-500"
+                            >
+                        </div>
+
+                        <div>
+                            <label
+                                for="date_to"
+                                class="mb-1 block text-xs font-medium text-slate-600"
+                            >
+                                По
+                            </label>
+
+                            <input
+                                type="date"
+                                id="date_to"
+                                name="date_to"
+                                class="w-full rounded-lg border border-slate-300
+                                    px-2 py-2 text-sm text-slate-700
+                                    focus:border-indigo-500
+                                    focus:ring-1 focus:ring-indigo-500"
+                            >
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="mt-3 w-full rounded-lg
+                            bg-indigo-600 px-3 py-2
+                            text-sm font-medium text-white
+                            shadow-sm transition-colors
+                            hover:bg-indigo-500"
+                    >
+                        Скачать Excel
+                    </button>
+
+                </form>
+
+            </div>
+
+        </details>
+    </div>
+
+{% endcall %}
+
+
+{% if reports | length < 1 %}
+
+    {{ empty_state(
+        "Пока нет рапортов",
+        "Создайте первый, чтобы он появился здесь"
+    ) }}
+
+{% else %}
+
+    {% call(row) data_table(
+        [
+            "Скважина",
+            "Дата",
+            "Часы",
+            "Жидкость",
+            "Обв. %",
+            "Плотность",
+            "Нефть, т",
+            "Действия"
+        ],
+        align=[
+            "left",
+            "left",
+            "right",
+            "right",
+            "right",
+            "right",
+            "right",
+            "right"
+        ]
+    ) %}
+
+        {% for report in reports %}
+
             <tr class="hover:bg-slate-50">
+
                 {{ td(report.well_id, muted=True) }}
+
                 {{ td(report.date) }}
+
                 {{ td_num(report.operating_hours) }}
+
                 {{ td_num(report.liquid_produced) }}
+
                 {{ td_num(report.water_cut) }}
+
                 {{ td_num(report.density) }}
+
                 {{ td_num("%.2f"|format(report.net_oil)) }}
+
                 <td class="px-3 py-2">
                     <div class="flex justify-end gap-1">
-                        {{ icon_btn(url_for('daily_productions.edit_daily_production', well_id=report.well_id, date=report.date), "edit", "Редактировать") }}
-                        {{ icon_btn(url_for('daily_productions.delete_daily_production', well_id=report.well_id, date=report.date), "delete", "Удалить", method="POST", confirm="Вы уверены что хотите удалить рапорт?") }}
+
+                        {{ icon_btn(
+                            url_for(
+                                'daily_productions.edit_daily_production',
+                                well_id=report.well_id,
+                                date=report.date
+                            ),
+                            "edit",
+                            "Редактировать"
+                        ) }}
+
+                        {{ icon_btn(
+                            url_for(
+                                'daily_productions.delete_daily_production',
+                                well_id=report.well_id,
+                                date=report.date
+                            ),
+                            "delete",
+                            "Удалить",
+                            method="POST",
+                            confirm="Вы уверены что хотите удалить рапорт?"
+                        ) }}
+
                     </div>
                 </td>
+
             </tr>
-            {% endfor %}
-        {% endcall %}
-    {% endif %}
+
+        {% endfor %}
+
+    {% endcall %}
+
+{% endif %}
 
 {% endblock %}

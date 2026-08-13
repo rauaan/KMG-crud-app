@@ -4,11 +4,14 @@
 редактирования и удаления производственных рапортов скважин.
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+import io
+from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
 from flask_login import login_required
 from app.extensions import db
 from app.models import DailyProduction
 from app.forms import CreateDailyProduction
+from openpyxl import Workbook, load_workbook
 
 daily_productions_bp = Blueprint("daily_productions", __name__)
 
@@ -151,3 +154,110 @@ def delete_daily_production(well_id, date):
 
     except Exception as e:
         return f"ERROR {e}"
+
+    
+@daily_productions_bp.route("/download", methods=["GET"])
+@login_required
+def download_daily_productions():
+    """Экспортирует рапорты из базы данных в Excel-файл.
+
+    Позволяет указать начальную и конечную дату для выгрузки
+    суточных производственных рапортов. Если даты не указаны,
+    выгружаются все рапорты.
+
+    Returns:
+        Response: XLSX-файл с рапортами за выбранный период.
+    """
+
+    date_from = request.args.get("date_from")
+    date_to = request.args.get("date_to")
+
+    query = DailyProduction.query
+
+    if date_from:
+        date_from = datetime.strptime(date_from, "%Y-%m-%d").date()
+        query = query.filter(DailyProduction.date >= date_from)
+
+    if date_to:
+        date_to = datetime.strptime(date_to, "%Y-%m-%d").date()
+        query = query.filter(DailyProduction.date <= date_to)
+
+    reports = (
+        query
+        .order_by(DailyProduction.date)
+        .all()
+    )
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Рапорты"
+
+    headers = [
+        "Скважина (ID)",
+        "Дата",
+        "Время работы",
+        "Жидкость",
+        "Обводненность",
+        "Плотность",
+        "Чистая нефть",
+    ]
+
+    sheet.append(headers)
+
+    for report in reports:
+        sheet.append([
+            report.well_id,
+            report.date,
+            report.operating_hours,
+            report.liquid_produced,
+            report.water_cut,
+            report.density,
+            report.net_oil,
+        ])
+
+    # Форматирование заголовков
+    for cell in sheet[1]:
+        cell.font = cell.font.copy(bold=True)
+
+    sheet.freeze_panes = "A2"
+    sheet.auto_filter.ref = sheet.dimensions
+
+    # Ширина колонок
+    widths = [15, 15, 18, 15, 18, 15, 18]
+
+    for index, width in enumerate(widths, start=1):
+        sheet.column_dimensions[chr(64 + index)].width = width
+
+    # Создаём файл в памяти
+    output = io.BytesIO()
+
+    workbook.save(output)
+    output.seek(0)
+
+    # Имя файла
+    if date_from and date_to:
+        filename = (
+            f"daily_productions_"
+            f"{date_from}_{date_to}.xlsx"
+        )
+    elif date_from:
+        filename = f"daily_productions_from_{date_from}.xlsx"
+    elif date_to:
+        filename = f"daily_productions_to_{date_to}.xlsx"
+    else:
+        filename = "daily_productions_all.xlsx"
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=filename,
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument"
+            ".spreadsheetml.sheet"
+        ),
+    )
+
+@daily_productions_bp.route("/upload", methods=["GET", "POST"])
+@login_required
+def upload_daily_productions():
+    pass
