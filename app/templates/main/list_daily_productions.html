@@ -28,7 +28,7 @@
         ) }}
 
         <!-- Excel -->
-        <details class="relative">
+        <details class="relative" id="excel-menu">
 
             <summary
                 class="inline-flex cursor-pointer list-none items-center rounded-lg
@@ -49,12 +49,12 @@
                 </svg>
             </summary>
 
-                <div
-                    class="absolute right-0 mt-2 w-80
-                        rounded-xl border border-slate-200
-                        bg-white p-4 shadow-xl"
-                    style="z-index: 9999; isolation: isolate;"
-                >
+            <div
+                id="excel-menu-panel"
+                class="fixed w-80 rounded-xl border border-slate-200
+                    bg-white p-4 shadow-xl"
+                style="z-index: 9999; max-height: 80vh; overflow-y: auto;"
+            >
 
                 <!-- IMPORT -->
 
