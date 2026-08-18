@@ -9,7 +9,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
 from flask_login import login_required
 from app.extensions import db
-from app.models import DailyProduction
+from app.models import DailyProduction, Well
 from app.forms import CreateDailyProduction
 from openpyxl import Workbook, load_workbook
 
@@ -234,7 +234,6 @@ def download_daily_productions():
     workbook.save(output)
     output.seek(0)
 
-    # Имя файла
     if date_from and date_to:
         filename = (
             f"daily_productions_"
@@ -260,4 +259,159 @@ def download_daily_productions():
 @daily_productions_bp.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload_daily_productions():
-    pass
+    """Импортирует суточные рапорты из Excel-файла.
+
+    Ожидает файл в том же формате, в котором данные выгружаются
+    через download_daily_productions: первая строка - заголовки,
+    далее строки с колонками well_id, date, operating_hours,
+    liquid_produced, water_cut, density (колонка "Чистая нефть"
+    игнорируется, так как вычисляется автоматически).
+
+    Строки с ошибками (несуществующая скважина, дублирующийся
+    рапорт, некорректные значения) пропускаются, об этом сообщается
+    через flash-сообщения. Валидные строки сохраняются одной
+    транзакцией.
+
+    Returns:
+        Response: Перенаправление к списку рапортов с
+        flash-сообщением об итогах импорта.
+    """
+
+    if request.method == "GET":
+        return redirect(url_for("daily_productions.daily_productions"))
+
+    uploaded_file = request.files.get("file")
+
+    if uploaded_file is None or uploaded_file.filename == "":
+        flash("Файл не выбран", "warning")
+        return redirect(url_for("daily_productions.daily_productions"))
+
+    if not uploaded_file.filename.lower().endswith(".xlsx"):
+        flash("Допустим только формат .xlsx", "warning")
+        return redirect(url_for("daily_productions.daily_productions"))
+
+    try:
+        workbook = load_workbook(uploaded_file, read_only=True, data_only=True)
+        sheet = workbook.active
+    except Exception:
+        flash("Не удалось прочитать файл. Проверьте формат.", "warning")
+        return redirect(url_for("daily_productions.daily_productions"))
+
+    rows = list(sheet.iter_rows(min_row=2, values_only=True))  # пропускаем заголовок
+
+    if not rows:
+        flash("Файл не содержит данных", "warning")
+        return redirect(url_for("daily_productions.daily_productions"))
+
+    existing_wells = {w.id for w in Well.query.all()}
+    existing_reports = {
+        (dp.well_id, dp.date)
+        for dp in DailyProduction.query.with_entities(
+            DailyProduction.well_id, DailyProduction.date
+        ).all()
+    }
+
+    errors = []
+    to_create = []
+    seen_in_file = set()
+
+    for index, row in enumerate(rows, start=2):
+        if row is None or all(cell is None for cell in row):
+            continue  # пустая строка
+
+        if len(row) < 6:
+            errors.append(f"Строка {index}: недостаточно столбцов")
+            continue
+
+        well_id_raw, date_raw, hours_raw, liquid_raw, water_cut_raw, density_raw = row[:6]
+
+        if well_id_raw is None:
+            errors.append(f"Строка {index}: не указан ID скважины")
+            continue
+
+        try:
+            well_id = int(well_id_raw)
+        except (TypeError, ValueError):
+            errors.append(f"Строка {index}: некорректный ID скважины")
+            continue
+
+        if isinstance(date_raw, datetime):
+            date_value = date_raw.date()
+        elif hasattr(date_raw, "year") and hasattr(date_raw, "month"):
+            # уже date-подобный объект (openpyxl может вернуть datetime.date напрямую)
+            date_value = date_raw
+        elif isinstance(date_raw, str):
+            try:
+                date_value = datetime.strptime(date_raw, "%Y-%m-%d").date()
+            except ValueError:
+                errors.append(f"Строка {index}: некорректный формат даты")
+                continue
+        else:
+            errors.append(f"Строка {index}: не указана дата")
+            continue
+
+        try:
+            operating_hours = float(hours_raw)
+            liquid_produced = float(liquid_raw)
+            water_cut = float(water_cut_raw)
+            density = float(density_raw)
+        except (TypeError, ValueError):
+            errors.append(f"Строка {index}: числовые поля заполнены некорректно")
+            continue
+
+        if not (0 <= operating_hours <= 24):
+            errors.append(f"Строка {index}: время работы должно быть от 0ч до 24ч")
+            continue
+
+        if not (0 <= water_cut <= 100):
+            errors.append(f"Строка {index}: обводненность должна быть от 0%% до 100%%")
+            continue
+
+        if well_id not in existing_wells:
+            errors.append(f"Строка {index}: скважина с ID {well_id} не существует")
+            continue
+
+        key = (well_id, date_value)
+
+        if key in existing_reports:
+            errors.append(
+                f"Строка {index}: рапорт для скважины {well_id} за {date_value} уже существует"
+            )
+            continue
+
+        if key in seen_in_file:
+            errors.append(
+                f"Строка {index}: дублирующаяся запись внутри файла "
+                f"(скважина {well_id}, дата {date_value})"
+            )
+            continue
+
+        seen_in_file.add(key)
+        to_create.append(
+            DailyProduction(
+                well_id=well_id,
+                date=date_value,
+                operating_hours=operating_hours,
+                liquid_produced=liquid_produced,
+                water_cut=water_cut,
+                density=density,
+            )
+        )
+
+    if to_create:
+        try:
+            db.session.add_all(to_create)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return f"ERROR {e}"
+
+        flash(f"Импортировано рапортов: {len(to_create)}", "success")
+
+    if errors:
+        error_summary = "; ".join(errors[:10])
+        if len(errors) > 10:
+            error_summary += f" и еще {len(errors) - 10} ошибок"
+        flash(f"Пропущено строк: {len(errors)}. {error_summary}", "warning")
+
+    return redirect(url_for("daily_productions.daily_productions"))
