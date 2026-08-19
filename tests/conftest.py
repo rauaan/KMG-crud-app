@@ -11,8 +11,11 @@ from app.models import Well, Company, Account
 @pytest.fixture()
 def app():
     app = create_app()
-    app.config["TESTING"] = True
-    app.config["WTF_CSRF_ENABLED"] = False
+    app.config.update(
+        TESTING=True,
+        WTF_CSRF_ENABLED=False,
+        SECRET_KEY="test-secret-key",
+    )
 
     with app.app_context():
         db.create_all()
